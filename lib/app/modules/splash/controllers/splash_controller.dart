@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
 import '../../../services/local_storage_services/local_storage_services.dart';
-import '../../../services/secure_token_service/secure_token_service.dart';
 import '../../../routes/app_pages.dart';
-import '../../dashboard/views/dashboard_view.dart';
 
 class SplashController extends GetxController {
   @override
@@ -14,8 +12,8 @@ class SplashController extends GetxController {
   Future<void> _goNext() async {
     print("SplashController: start");
 
-    // Always wait for a bit so splash animation can be seen
-    await Future.delayed(const Duration(seconds: 2));
+    // Logo scale (~0.2s) + rotation (~1.2s) + exit fade (~0.5s) — keep buffer for polish
+    await Future.delayed(const Duration(milliseconds: 2600));
 
     final hasSeen = LocalStorageService().getHasSeenSplash();
     print("SplashController: hasSeenSplash=$hasSeen");
@@ -24,13 +22,8 @@ class SplashController extends GetxController {
       print("SplashController: set hasSeenSplash=true");
     }
 
-    // Check if user is logged in
-    bool loggedIn = false;
-    try {
-      loggedIn = await SecureTokenService().isLoggedIn();
-    } catch (_) {
-      loggedIn = false;
-    }
+    // Token in prefs and/or secure storage (secure alone can fail on some devices)
+    final loggedIn = await LocalStorageService().hasAuthSession();
     print("SplashController: loggedIn=$loggedIn");
 
     // Check if onboarding is completed

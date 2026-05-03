@@ -1,43 +1,27 @@
 import 'package:get/get.dart';
-import '../../inbox/controllers/inbox_controller.dart';
-import '../../today/controllers/today_controller.dart';
-import '../../upcoming/controllers/upcoming_controller.dart';
 import '../../browse/controllers/browse_controller.dart';
+import '../../projects/controllers/projects_controller.dart';
 
 class DashboardController extends GetxController {
   final RxInt index = 0.obs;
 
   void setIndex(int i) {
+    if (index.value == i) return;
     index.value = i;
-    _triggerLoading(i);
+    // Inbox / Today / Upcoming: do not refetch on every tab switch — use pull-to-refresh there.
+    _maybeRefreshSecondaryTabs(i);
   }
 
-  void _triggerLoading(int i) {
+  void _maybeRefreshSecondaryTabs(int i) {
     switch (i) {
-      case 0:
-        if (Get.isRegistered<InboxController>()) {
-          Get.find<InboxController>().startLoading();
-        }
-        break;
-      case 1:
-        if (Get.isRegistered<TodayController>()) {
-          Get.find<TodayController>().startLoading();
-        }
-        break;
-      case 2:
-        if (Get.isRegistered<UpcomingController>()) {
-          Get.find<UpcomingController>().startLoading();
+      case 3:
+        if (Get.isRegistered<ProjectsController>()) {
+          Get.find<ProjectsController>().loadAll();
         }
         break;
       case 4:
         if (Get.isRegistered<BrowseController>()) {
-          final browseCtrl = Get.find<BrowseController>();
-          browseCtrl.isProjectsLoading.value = true;
-          browseCtrl.isTemplatesLoading.value = true;
-          Future.delayed(const Duration(milliseconds: 800), () {
-            browseCtrl.isProjectsLoading.value = false;
-            browseCtrl.isTemplatesLoading.value = false;
-          });
+          Get.find<BrowseController>().loadBrowse();
         }
         break;
     }

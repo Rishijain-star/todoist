@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/const/app_colors.dart';
+import '../../../core/const/user_assets.dart';
 import '../../../core/widgets/app_widgets.dart';
 import '../controllers/onboarding_controller.dart';
 
@@ -49,7 +50,6 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
                   color: isDark
                       ? AppColors.darkTextSecondary
                       : AppColors.textSecondary,
-                  fontFamily: 'Nunito',
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -64,7 +64,6 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
               'Skip',
               style: TextStyle(
                 color: AppColors.accentBlue,
-                fontFamily: 'Nunito',
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -86,8 +85,9 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'Nunito',
-                    color: isDark ? Colors.white : Colors.black,
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                   children: [
                     const TextSpan(text: 'Never miss a\n'),
@@ -106,47 +106,58 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
                   color: isDark
                       ? AppColors.darkTextSecondary
                       : AppColors.textSecondary,
-                  fontFamily: 'Nunito',
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // Notification Preview
+              // Notification preview — dark text on light surface (readable on canvas).
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
+                  color: isDark ? AppColors.darkSurfaceElevated : AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppColors.primaryColor.withOpacity(0.2),
+                    color: isDark ? AppColors.darkBorder : AppColors.borderLight,
                   ),
+                  boxShadow: isDark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 40,
-                      height: 40,
+                      width: 36,
+                      height: 36,
                       decoration: BoxDecoration(
                         color: AppColors.primaryColor,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
                         Icons.notifications_none_rounded,
-                        color: Colors.white,
+                        color: AppColors.white,
+                        size: 20,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             options[0].$1,
-                            style: const TextStyle(
-                              fontSize: 14,
+                            style: TextStyle(
+                              fontSize: 13,
                               fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                              color: isDark
+                                  ? AppColors.darkTextPrimary
+                                  : AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -154,8 +165,10 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
                             options[0].$2,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.white.withOpacity(0.7),
-                              height: 1.3,
+                              height: 1.35,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -174,7 +187,7 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 18),
 
               // Toggle Options
               Expanded(
@@ -185,9 +198,7 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
                     final opt = options[i + 1];
                     final icon = i == 0
                         ? Icons.wb_sunny_outlined
-                        : (i == 1
-                              ? Icons.nights_stay_outlined
-                              : Icons.calendar_today_outlined);
+                        : (i == 2 ? Icons.calendar_today_outlined : null);
                     return Row(
                       children: [
                         Container(
@@ -204,15 +215,21 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
                                   : AppColors.borderLight,
                             ),
                           ),
-                          child: Icon(
-                            icon,
-                            color: i == 0
-                                ? AppColors.gold
-                                : (i == 1
-                                      ? AppColors.accentBlue
-                                      : AppColors.gold),
-                            size: 20,
-                          ),
+                          child: i == 1
+                              ? Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Image.asset(
+                                    UserAssets.navIconToday,
+                                    fit: BoxFit.contain,
+                                  ),
+                                )
+                              : Icon(
+                                  icon!,
+                                  color: i == 0
+                                      ? AppColors.gold
+                                      : AppColors.gold,
+                                  size: 20,
+                                ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -224,7 +241,9 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
-                                  color: isDark ? Colors.white : Colors.black,
+                                  color: isDark
+                                      ? AppColors.darkTextPrimary
+                                      : AppColors.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -233,8 +252,8 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: isDark
-                                      ? AppColors.darkTextMuted
-                                      : AppColors.textMuted,
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.textSecondary,
                                 ),
                               ),
                             ],
@@ -243,7 +262,12 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
                         Switch.adaptive(
                           value: opt.$3,
                           onChanged: (v) {},
-                          activeColor: AppColors.accentBlue,
+                          activeTrackColor: AppColors.primaryColor
+                              .withValues(alpha: 0.45),
+                          activeThumbColor: AppColors.white,
+                          inactiveTrackColor: isDark
+                              ? AppColors.darkBorder
+                              : AppColors.borderLight,
                         ),
                       ],
                     );
@@ -255,39 +279,38 @@ class OnboardingRemindersView extends GetView<OnboardingController> {
               Center(
                 child: Text(
                   'You can update these anytime in Settings',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
+                    fontWeight: FontWeight.w500,
                     color: isDark
-                        ? AppColors.darkTextMuted
-                        : AppColors.textMuted,
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                 ),
               ),
               const SizedBox(height: 24),
 
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: controller.submitReminders,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(27),
-                    ),
-                    elevation: 0,
+              ElevatedButton(
+                onPressed: controller.submitReminders,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  minimumSize: const Size(double.infinity, 54),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(27),
                   ),
-                  child: const Text(
-                    'Almost there! Continue →',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Almost there! Continue →',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
             ],
           ),
         ),

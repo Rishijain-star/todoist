@@ -3,8 +3,13 @@ import 'package:get/get.dart';
 import '../../../routes/app_pages.dart';
 import '../../../core/const/app_colors.dart';
 import '../../../core/widgets/app_widgets.dart';
+import '../../../core/widgets/task_action_menu_sheet.dart';
+import '../../../data/models/task_model.dart';
+import '../../inbox/controllers/inbox_controller.dart';
+import '../../task/views/task_detail_sheet.dart';
 import '../controllers/today_controller.dart';
 import '../../settings/controllers/settings_controller.dart';
+import 'package:karan/app/services/task_service.dart';
 
 // ═══════════════════════════════════════════════════
 //  TODAY VIEW
@@ -29,6 +34,7 @@ class _TodayViewState extends State<TodayView> {
     final iconColor = isDark
         ? AppColors.darkTextSecondary
         : AppColors.textSecondary;
+    final userName = 'Rohit'; // Matches the screenshot
 
     return Scaffold(
       backgroundColor: isDark
@@ -40,127 +46,192 @@ class _TodayViewState extends State<TodayView> {
             : AppColors.backgroundLight,
         automaticallyImplyLeading: false,
         elevation: 0,
-        titleSpacing: 18,
-        title: Row(
-          children: [
-            Image.asset('assets/taskerer_logo_small.png', height: 32),
-            const SizedBox(width: 8),
-            RichText(
-              text: TextSpan(
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'Nunito',
+        titleSpacing: 24,
+        title: Text(
+          'Today',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.notifications_none_rounded,
+                    size: 20,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
+                  ),
+                  onPressed: () {
+                    Get.toNamed(Routes.REPORTS); // Or actual notification route if it exists
+                  },
                 ),
-                children: [
-                  TextSpan(
-                    text: 'Task',
-                    style: TextStyle(color: textColor),
+                const SizedBox(width: 12),
+                IconButton(
+                  icon: Icon(
+                    Icons.tune_rounded,
+                    size: 20,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
-                  const TextSpan(
-                    text: 'erer',
-                    style: TextStyle(color: AppColors.primaryColor),
-                  ),
-                ],
-              ),
+                  onPressed: () {
+                    // Open display settings or filters
+                  },
+                ),
+              ],
             ),
-            const Spacer(),
-            Icon(Icons.search_rounded, color: iconColor),
-            const SizedBox(width: 16),
-            GestureDetector(
-              onTap: () => Get.toNamed(Routes.NOTIFICATIONS),
-              child: Stack(
-                children: [
-                  Icon(Icons.notifications_none_rounded, color: iconColor),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isDark
-                              ? AppColors.darkBackground
-                              : Colors.white,
-                          width: 2,
+          ),
+        ],
+      ),
+      body: Obx(() {
+        Future<void> onRefresh() =>
+            Get.find<InboxController>().refreshTasks();
+
+        if (controller.isLoading.value) {
+          return RefreshIndicator(
+            onRefresh: onRefresh,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.sizeOf(context).height * 0.65,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (controller.todayTasks.isEmpty && controller.overdueTasks.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: onRefresh,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.sizeOf(context).height * 0.72,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                  // Illustration Placeholder
+                  Container(
+                    width: 140,
+                    height: 140,
+                    decoration: BoxDecoration(
+                      color: AppColors.accentBlue.withOpacity(0.05),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(
+                          Icons.cruelty_free_rounded,
+                          size: 80,
+                          color: AppColors.accentBlue.withOpacity(0.2),
                         ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '2',
-                          style: TextStyle(
-                            fontSize: 6,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
+                        Positioned(
+                          top: 30,
+                          right: 30,
+                          child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: const BoxDecoration(
+                              color: AppColors.gold,
+                              shape: BoxShape.circle,
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                      ),
+                      children: [
+                        const TextSpan(
+                          text: 'All clear, ',
+                          style: TextStyle(color: AppColors.textPrimary),
+                        ),
+                        TextSpan(
+                          text: '$userName!',
+                          style: const TextStyle(color: AppColors.accentBlue),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Nothing scheduled today. Relax and recharge — you\'ve earned it!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  OutlinedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    label: const Text(
+                      'Share #TaskererZero',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.accentBlue,
+                      side: BorderSide(
+                        color: AppColors.accentBlue.withOpacity(0.3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        child: Obx(() {
-          if (controller.isLoading.value) {
-            return _TodayFullShimmer(isDark: isDark);
-          }
-
-          final currentLayout = settings.layout.value;
-
-          return Column(
-            children: [
-              Expanded(
-                child: PageView(
-                  controller: _pageController,
-                  onPageChanged: (i) => setState(() => _currentPage = i),
-                  children: [
-                    _TodayMainContent(
-                      isDark: isDark,
-                      textColor: textColor,
-                      currentLayout: currentLayout,
-                    ),
-                    _TodayMainContent(
-                      isDark: isDark,
-                      textColor: textColor,
-                      currentLayout: currentLayout,
-                      isNextDay: true,
-                    ),
-                  ],
-                ),
-              ),
-              // Dots Indicator
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(2, (index) {
-                    return Container(
-                      width: 6,
-                      height: 6,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        color: _currentPage == index
-                            ? textColor
-                            : (isDark
-                                  ? AppColors.darkBorder
-                                  : AppColors.borderLight),
-                        shape: BoxShape.circle,
+                        ],
                       ),
-                    );
-                  }),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
-        }),
-      ),
+        }
+
+        return RefreshIndicator(
+          onRefresh: onRefresh,
+          child: _TodayMainContent(
+            isDark: isDark,
+            textColor: textColor,
+            currentLayout: 0,
+            scrollPhysics: const AlwaysScrollableScrollPhysics(),
+          ),
+        );
+      }),
     );
   }
 }
@@ -170,18 +241,67 @@ class _TodayMainContent extends StatelessWidget {
   final Color textColor;
   final int currentLayout;
   final bool isNextDay;
+  final ScrollPhysics? scrollPhysics;
 
   const _TodayMainContent({
     required this.isDark,
     required this.textColor,
     required this.currentLayout,
     this.isNextDay = false,
+    this.scrollPhysics,
   });
+
+  Widget _buildTaskCard(
+    BuildContext context,
+    Task task,
+    bool isDark,
+    bool hideCompletedSubtasks,
+  ) {
+    final subs = hideCompletedSubtasks
+        ? task.subtasks.where((s) => !s.isCompleted).toList()
+        : task.subtasks;
+    return AppTaskCard(
+      title: task.title,
+      subtitle: task.desc,
+      time: task.time ?? (task.dueToday ? 'Today' : null),
+      category: task.status,
+      dotColor: task.priority == 1
+          ? AppColors.red
+          : task.priority == 2
+          ? AppColors.gold
+          : task.priority == 3
+          ? AppColors.primaryColor
+          : null,
+      isDone: task.isCompleted,
+      isOverdue: !isNextDay && task.dueDate != null && task.dueDate!.isBefore(DateTime.now()),
+      onCheckTap: (v) {
+        Get.find<TaskService>().toggleTaskCompletion(task.id, v);
+      },
+      onTap: () => showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => TaskDetailSheet(task: task),
+      ),
+      onMoreTap: () => showTaskActionMenu(context, task: task),
+      subtasks: subs
+          .map(
+            (st) => _buildTaskCard(
+              context,
+              st,
+              isDark,
+              hideCompletedSubtasks,
+            ),
+          )
+          .toList(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<TodayController>();
     return SingleChildScrollView(
+      physics: scrollPhysics,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +314,6 @@ class _TodayMainContent extends StatelessWidget {
               fontSize: 24,
               fontWeight: FontWeight.w800,
               color: textColor,
-              fontFamily: 'Nunito',
             ),
           ),
           Text(
@@ -203,7 +322,6 @@ class _TodayMainContent extends StatelessWidget {
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
-              fontFamily: 'Nunito',
             ),
           ),
           const SizedBox(height: 24),
@@ -214,67 +332,64 @@ class _TodayMainContent extends StatelessWidget {
                 greeting: 'Good Morning',
                 name: 'Karan',
                 date: 'Sun, 8 Mar',
-                completedTasks: controller.completedCount.value,
-                totalTasks: controller.totalCount.value,
+                completedTasks: controller.completedCount,
+                totalTasks: controller.totalCount,
                 motivation:
-                    '${controller.totalCount.value - controller.completedCount.value} more to go — you\'re killing it!',
+                    '${controller.totalCount - controller.completedCount} more to go — you\'re killing it!',
               ),
             ),
           const SizedBox(height: 32),
 
           // Overdue Section (Image 2)
-          if (!isNextDay) ...[
-            Row(
+          Obx(() {
+            if (isNextDay || controller.overdueTasks.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            final hide =
+                Get.find<InboxController>().hideCompletedSubtasks.value;
+            return Column(
               children: [
-                Text(
-                  'Overdue',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: textColor,
-                    fontFamily: 'Nunito',
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'Overdue',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${controller.overdueTasks.length}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark
+                            ? AppColors.darkTextMuted
+                            : AppColors.textMuted,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      'Reschedule',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  '2',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDark
-                        ? AppColors.darkTextMuted
-                        : AppColors.textMuted,
-                    fontWeight: FontWeight.w600,
-                  ),
+                const SizedBox(height: 16),
+                ...controller.overdueTasks.map(
+                  (task) =>
+                      _buildTaskCard(context, task, isDark, hide),
                 ),
-                const Spacer(),
-                Text(
-                  'Reschedule',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryColor,
-                  ),
-                ),
+                const SizedBox(height: 24),
               ],
-            ),
-            const SizedBox(height: 16),
-            AppTaskCard(
-              title: 'Using this guide 👇',
-              subtitle: 'Click here!...',
-              category: 'Team Setup Guide',
-              time: 'Yesterday',
-              isOverdue: true,
-            ),
-            AppTaskCard(
-              title: 'All about tasks (Watch)',
-              subtitle: 'Check the video tutorial...',
-              category: 'Team Setup Guide',
-              time: 'Yesterday',
-              isOverdue: true,
-              commentCount: 1,
-            ),
-            const SizedBox(height: 24),
-          ],
+            );
+          }),
 
           // Today's Tasks Header
           Row(
@@ -300,116 +415,20 @@ class _TodayMainContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Conditional Layout
-          if (currentLayout == 1) // Board Layout
-            SizedBox(
-              height: 400,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _BoardColumn(
-                    title: 'To Do',
-                    count: 2,
-                    tasks: [
-                      AppTaskCard(
-                        title: 'Team standup meeting',
-                        time: '10:00 AM',
-                        category: 'Work',
-                        dotColor: AppColors.primaryColor,
-                        onCheckTap: (v) => controller.toggleTask(v),
-                      ),
-                      AppTaskCard(
-                        title: 'Review Q1 project report',
-                        time: '2:00 PM',
-                        category: 'Important',
-                        dotColor: AppColors.gold,
-                        onCheckTap: (v) => controller.toggleTask(v),
-                      ),
-                    ],
-                    isDark: isDark,
-                  ),
-                  const SizedBox(width: 16),
-                  _BoardColumn(
-                    title: 'In Progress',
-                    count: 1,
-                    tasks: [
-                      AppTaskCard(
-                        title: 'Buy groceries',
-                        time: 'Personal',
-                        category: 'Errand',
-                        dotColor: AppColors.accentBlue,
-                        onCheckTap: (v) => controller.toggleTask(v),
-                      ),
-                    ],
-                    isDark: isDark,
-                  ),
-                  const SizedBox(width: 16),
-                  _BoardColumn(
-                    title: 'Done',
-                    count: 1,
-                    tasks: [
-                      AppTaskCard(
-                        title: 'Morning workout 💪',
-                        time: 'Done',
-                        category: '',
-                        dotColor: AppColors.green,
-                        isDone: true,
-                        onCheckTap: (v) => controller.toggleTask(v),
-                      ),
-                    ],
-                    isDark: isDark,
-                  ),
-                ],
-              ),
-            )
-          else if (currentLayout == 2) // Calendar Layout
-            Container(
-              height: 300,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkSurface : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isDark ? AppColors.darkBorder : AppColors.borderLight,
-                ),
-              ),
-              child: const Center(child: Text('Calendar View - Coming Soon')),
-            )
-          else // List Layout (Default)
-            Column(
-              children: [
-                AppTaskCard(
-                  title: 'Team standup meeting',
-                  time: '10:00 AM',
-                  category: 'Work',
-                  dotColor: AppColors.primaryColor,
-                  onCheckTap: (v) => controller.toggleTask(v),
-                ),
-                AppTaskCard(
-                  title: 'Review Q1 project report',
-                  time: '2:00 PM',
-                  category: 'Important',
-                  dotColor: AppColors.gold,
-                  onCheckTap: (v) => controller.toggleTask(v),
-                ),
-                AppTaskCard(
-                  title: 'Buy groceries on the way home',
-                  time: 'Personal',
-                  category: 'Errand',
-                  dotColor: isDark
-                      ? AppColors.darkTextMuted
-                      : AppColors.textMuted,
-                  onCheckTap: (v) => controller.toggleTask(v),
-                ),
-                AppTaskCard(
-                  title: 'Morning workout 💪',
-                  time: 'Done',
-                  category: '',
-                  dotColor: AppColors.green,
-                  isDone: true,
-                  onCheckTap: (v) => controller.toggleTask(v),
-                ),
-              ],
-            ),
+          Obx(
+            () {
+              final hide =
+                  Get.find<InboxController>().hideCompletedSubtasks.value;
+              return Column(
+                children: controller.todayTasks
+                    .map(
+                      (task) =>
+                          _buildTaskCard(context, task, isDark, hide),
+                    )
+                    .toList(),
+              );
+            },
+          ),
           const SizedBox(height: 100),
         ],
       ),
@@ -562,7 +581,6 @@ class _BoardColumn extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'Nunito',
                   color: isDark
                       ? AppColors.darkTextPrimary
                       : AppColors.textPrimary,
@@ -644,7 +662,6 @@ class _AddCardButton extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              fontFamily: 'Nunito',
               color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
             ),
           ),

@@ -90,7 +90,6 @@ class OnboardingWelcomeView extends StatelessWidget {
                 color: isDark
                     ? AppColors.darkTextPrimary
                     : AppColors.textPrimary,
-                fontFamily: 'Nunito',
               ),
               textAlign: TextAlign.center,
             ),
@@ -154,7 +153,6 @@ class _CheckLine extends StatelessWidget {
               color: isDark
                   ? AppColors.darkTextSecondary
                   : AppColors.textSecondary,
-              fontFamily: 'Nunito',
             ),
           ),
         ],
@@ -221,7 +219,6 @@ class _OnboardingNameViewState extends State<OnboardingNameView> {
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
                 color: AppColors.gold,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 6),
@@ -233,7 +230,6 @@ class _OnboardingNameViewState extends State<OnboardingNameView> {
                 color: isDark
                     ? AppColors.darkTextSecondary
                     : AppColors.textSecondary,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 32),
@@ -276,7 +272,6 @@ class _OnboardingNameViewState extends State<OnboardingNameView> {
                 color: isDark
                     ? AppColors.darkTextPrimary
                     : AppColors.textPrimary,
-                fontFamily: 'Nunito',
               ),
               decoration: const InputDecoration(
                 hintText: 'Enter your full name',
@@ -366,7 +361,6 @@ class _OnboardingGoalViewState extends State<OnboardingGoalView> {
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
                 color: AppColors.gold,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 6),
@@ -378,7 +372,6 @@ class _OnboardingGoalViewState extends State<OnboardingGoalView> {
                 color: isDark
                     ? AppColors.darkTextSecondary
                     : AppColors.textSecondary,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 24),
@@ -418,7 +411,6 @@ class _OnboardingGoalViewState extends State<OnboardingGoalView> {
                                 color: isDark
                                     ? AppColors.darkTextPrimary
                                     : AppColors.textPrimary,
-                                fontFamily: 'Nunito',
                               ),
                             ),
                             const SizedBox(height: 3),
@@ -430,7 +422,6 @@ class _OnboardingGoalViewState extends State<OnboardingGoalView> {
                                 color: isDark
                                     ? AppColors.darkTextSecondary
                                     : AppColors.textSecondary,
-                                fontFamily: 'Nunito',
                               ),
                             ),
                           ],

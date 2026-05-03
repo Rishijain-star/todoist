@@ -17,9 +17,12 @@ import '../modules/today/views/today_view.dart';
 import '../modules/upcoming/views/upcoming_view.dart';
 import '../modules/browse/views/browse_view.dart';
 import '../modules/browse/views/templates_view.dart';
+import '../modules/browse/views/templates_list_view.dart';
 import '../modules/browse/views/project_calendar_view.dart';
 import '../modules/settings/views/settings_view.dart';
 import '../modules/team/views/team_view.dart';
+import '../modules/reports/views/reports_view.dart';
+import '../modules/admin/views/admin_view.dart';
 import '../modules/inbox/bindings/inbox_binding.dart';
 import '../modules/today/bindings/today_binding.dart';
 import '../modules/upcoming/bindings/upcoming_binding.dart';
@@ -109,7 +112,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.BROWSE_TEMPLATES,
-      page: () => const TemplatesView(),
+      page: () => const TemplatesListView(),
       binding: BrowseBinding(),
     ),
     GetPage(
@@ -132,5 +135,7 @@ class AppPages {
       page: () => const NotificationsView(),
       binding: NotificationsBinding(),
     ),
+    GetPage(name: _Paths.REPORTS, page: () => const ReportsView()),
+    GetPage(name: _Paths.ADMIN, page: () => const AdminView()),
   ];
 }

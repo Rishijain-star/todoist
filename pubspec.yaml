@@ -45,6 +45,10 @@ dependencies:
   intl: ^0.20.2
   flutter_secure_storage: ^9.2.2
   image_picker: ^1.0.7
+  confetti: ^0.7.0
+  google_fonts: ^8.1.0
+  lottie: ^3.3.3
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +76,10 @@ flutter:
   assets:
     - assets/
     - assets/onboarding/
+    - assets/animation/
+    - assets/user_media/images/
+    - assets/user_media/icons/
+    - assets/user_media/videos/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

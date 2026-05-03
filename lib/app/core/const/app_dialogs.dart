@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import '../../services/local_storage_services/local_storage_services.dart';
+import '../../routes/app_pages.dart';
 import '../extensions.dart';
 import 'app_colors.dart';
 
@@ -121,9 +122,9 @@ class AppDialog {
                 SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Get.toNamed(Routes.LOGIN);
-                      LocalStorageService().logout();
+                    onPressed: () async {
+                      await LocalStorageService().logout();
+                      Get.offAllNamed(Routes.AUTH_WELCOME);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,

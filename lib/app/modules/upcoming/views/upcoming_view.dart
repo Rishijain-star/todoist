@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:karan/app/routes/app_pages.dart';
+import 'package:intl/intl.dart';
 import '../../../core/const/app_colors.dart';
 import '../../../core/widgets/app_widgets.dart';
-import '../../task/views/add_task_sheet.dart';
+import '../../task/views/task_detail_sheet.dart';
+import '../../inbox/controllers/inbox_controller.dart';
 import '../controllers/upcoming_controller.dart';
+import 'package:karan/app/services/task_service.dart';
 
 class UpcomingView extends StatefulWidget {
   const UpcomingView({super.key});
@@ -14,80 +16,70 @@ class UpcomingView extends StatefulWidget {
 }
 
 class _UpcomingViewState extends State<UpcomingView> {
-  int _selectedDayIndex = 0;
-  bool _showCalendar = false;
-  DateTime _selectedDate = DateTime(2026, 3, 15);
-  final DateTime _now = DateTime(2026, 3, 1);
   final UpcomingController _controller = Get.find<UpcomingController>();
+  final Map<DateTime, GlobalKey> _dateKeys = {};
 
-  List<DateTime> get _weekDays =>
-      List.generate(7, (i) => _now.add(Duration(days: i)));
+  String _formatDateHeader(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+    final taskDate = DateTime(date.year, date.month, date.day);
 
-  String _weekLetter(int weekday) =>
-      ['M', 'T', 'W', 'T', 'F', 'S', 'S'][weekday - 1];
-
-  String _weekdayFull(int weekday) => [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ][weekday - 1];
-
-  String _monthName(int m) => [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ][m - 1];
-
-  String _monthFull(int m) => [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ][m - 1];
-
-  String _dayLabel(int offset) {
-    final d = _now.add(Duration(days: offset));
-    final base = '${_weekdayFull(d.weekday)}, ${_monthName(d.month)} ${d.day}';
-    if (offset == 0) return '$base · Today';
-    if (offset == 1) return '$base · Tomorrow';
+    String base = DateFormat('EEEE, d MMM').format(date);
+    if (taskDate == today) return '$base · Today';
+    if (taskDate == tomorrow) return '$base · Tomorrow';
     return base;
   }
 
-  void _openAddTask() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => AddTaskSheet(onSave: (_) {}),
+  List<DateTime> _getWeekDays(DateTime centerDate) {
+    // Show 7 days starting from 3 days before centerDate
+    return List.generate(
+      7,
+      (index) => centerDate.add(Duration(days: index - 3)),
     );
+  }
+
+  void _scrollToDate(DateTime date) {
+    final dateOnly = DateTime(date.year, date.month, date.day);
+    _controller.selectDate(dateOnly);
+
+    // Find the actual date to scroll to (either exact match or nearest future date)
+    final grouped = _controller.groupedTasks;
+    final sortedDates = grouped.keys.toList()..sort();
+
+    DateTime? targetDate;
+    if (grouped.containsKey(dateOnly)) {
+      targetDate = dateOnly;
+    } else {
+      // Find the first date after the selected one
+      for (var d in sortedDates) {
+        if (d.isAfter(dateOnly)) {
+          targetDate = d;
+          break;
+        }
+      }
+    }
+
+    if (targetDate != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final key = _dateKeys[targetDate];
+        if (key != null && key.currentContext != null) {
+          Scrollable.ensureVisible(
+            key.currentContext!,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final currentMonth = _monthFull(_now.month);
-    final currentYear = _now.year;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.textPrimary;
 
     return Scaffold(
       backgroundColor: isDark
@@ -99,259 +91,268 @@ class _UpcomingViewState extends State<UpcomingView> {
             : AppColors.backgroundLight,
         automaticallyImplyLeading: false,
         elevation: 0,
-        titleSpacing: 18,
-        title: Obx(() {
-          if (_controller.isLoading.value) {
-            return Shimmer(
-              child: const ShimmerBox(
-                height: 18,
-                width: 140,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-            );
-          }
-          return Text(
-            'Upcoming',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              fontFamily: 'Nunito',
-              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-            ),
-          );
-        }),
+        titleSpacing: 24,
+        title: Text(
+          'Upcoming',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            color: textColor,
+          ),
+        ),
         actions: [
-          AppIconButton(
-            size: 34,
-            icon: Icon(
-              Icons.tune_rounded,
-              size: 17,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.textSecondary,
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Row(
+              children: [
+                AppIconButton(
+                  icon: Icon(
+                    Icons.article_outlined,
+                    size: 20,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
+                  ),
+                  onTap: () {},
+                ),
+                const SizedBox(width: 12),
+                AppIconButton(
+                  icon: Icon(
+                    Icons.more_horiz_rounded,
+                    size: 20,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
+                  ),
+                  onTap: () {},
+                ),
+              ],
             ),
-            onTap: () {},
           ),
-          const SizedBox(width: 8),
-          AppIconButton(
-            size: 34,
-            icon: Icon(
-              Icons.more_horiz_rounded,
-              size: 17,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.textSecondary,
-            ),
-            onTap: () {},
-          ),
-          const SizedBox(width: 16),
         ],
       ),
-      body: SafeArea(
-        child: Obx(() {
-          if (_controller.isLoading.value) {
-            return _UpcomingShimmer(isDark: isDark);
-          }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
-                child: GestureDetector(
-                  onTap: () => setState(() => _showCalendar = !_showCalendar),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '$currentMonth $currentYear',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          fontFamily: 'Nunito',
-                          color: AppColors.primaryColor,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        _showCalendar
-                            ? Icons.keyboard_arrow_up_rounded
-                            : Icons.keyboard_arrow_down_rounded,
-                        size: 18,
-                        color: AppColors.primaryColor,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (!_showCalendar)
-                // ── Week Strip (Scrollable) ───────────────────────────────
-                Container(
-                  color: isDark
-                      ? AppColors.darkBackground
-                      : AppColors.backgroundLight,
-                  padding: const EdgeInsets.fromLTRB(0, 4, 0, 14),
-                  height: 80,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    itemCount: 30,
-                    itemBuilder: (ctx, i) {
-                      final day = _now.add(Duration(days: i));
-                      final isToday = i == 0;
-                      final isSel = i == _selectedDayIndex;
+      body: Obx(() {
+        Future<void> onRefresh() async {
+          await Get.find<InboxController>().refreshTasks();
+          await _controller.loadUpcoming(silent: false);
+        }
 
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedDayIndex = i),
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: SizedBox(
-                            width: 44,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  _weekLetter(day.weekday),
-                                  style: TextStyle(
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w800,
-                                    fontFamily: 'Nunito',
-                                    color: isDark
-                                        ? AppColors.darkTextMuted
-                                        : AppColors.textMuted,
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  width: 36,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: isToday
-                                        ? const LinearGradient(
-                                            colors: [
-                                              AppColors.primaryColor,
-                                              AppColors.accentBlue,
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          )
-                                        : null,
-                                    color: isSel && !isToday
-                                        ? AppColors.primaryColor.withOpacity(
-                                            0.12,
-                                          )
-                                        : Colors.transparent,
-                                    boxShadow: isToday
-                                        ? [
-                                            BoxShadow(
-                                              color: AppColors.primaryColor
-                                                  .withOpacity(0.3),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ]
-                                        : null,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '${day.day}',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Nunito',
-                                        color: isToday
-                                            ? Colors.white
-                                            : isSel
-                                            ? AppColors.primaryColor
-                                            : (isDark
-                                                  ? AppColors.darkTextSecondary
-                                                  : AppColors.textSecondary),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+        if (_controller.isLoading.value) {
+          return RefreshIndicator(
+            onRefresh: onRefresh,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.sizeOf(context).height * 0.65,
+                  child: _UpcomingShimmer(isDark: isDark),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final selectedDate = _controller.selectedDate.value;
+        final weekDays = _getWeekDays(selectedDate);
+        final grouped = _controller.groupedTasks;
+        final sortedDates = grouped.keys.toList()..sort();
+
+        // Pre-generate keys for all dates to ensure we can scroll to them
+        for (var date in sortedDates) {
+          _dateKeys[date] ??= GlobalKey();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Month Year Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: Row(
+                children: [
+                  Text(
+                    DateFormat('MMMM yyyy').format(selectedDate),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: textColor,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_drop_down_rounded,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
+                  ),
+                ],
+              ),
+            ),
+
+            // Horizontal Week Calendar
+            Container(
+              height: 80,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: weekDays.length,
+                itemBuilder: (context, index) {
+                  final day = weekDays[index];
+                  final isSelected =
+                      day.year == selectedDate.year &&
+                      day.month == selectedDate.month &&
+                      day.day == selectedDate.day;
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: GestureDetector(
+                      onTap: () => _scrollToDate(day),
+                      child: Column(
+                        children: [
+                          Text(
+                            DateFormat('E').format(day)[0], // M, T, W...
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected
+                                  ? AppColors.accentBlue
+                                  : AppColors.textMuted,
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                )
-              else
-                // ── Full Calendar Grid ──────────────────────────────────
-                _FullCalendarGrid(
-                  isDark: isDark,
-                  selectedDate: _selectedDate,
-                  onDateSelected: (date) {
-                    setState(() {
-                      _selectedDate = date;
-                    });
-                  },
-                ),
-
-              Divider(
-                color: isDark ? AppColors.darkBorder : AppColors.borderLight,
-                height: 1,
-              ),
-
-              // ── Date Sections & Tasks ────────────────────────────
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.only(bottom: 100),
-                  children: [
-                    _DateSection(
-                      label: 'Overdue',
-                      isToday: false,
-                      isDark: isDark,
-                      onAddTap: _openAddTask,
-                      tasks: [
-                        AppTaskCard(
-                          title: 'Using this guide 👇',
-                          subtitle: 'Click here!...',
-                          category: 'Team Setup Guide',
-                          isOverdue: true,
-                          time: 'Yesterday',
-                        ),
-                        AppTaskCard(
-                          title: 'All about tasks (Watch)',
-                          subtitle: 'Check the video tutorial...',
-                          category: 'Team Setup Guide',
-                          isOverdue: true,
-                          time: 'Yesterday',
-                        ),
-                      ],
-                    ),
-                    _DateSection(
-                      label: 'Sunday, Mar 15 · Today',
-                      isToday: true,
-                      isDark: isDark,
-                      onAddTap: _openAddTask,
-                      tasks: [
-                        AppTaskCard(
-                          title: 'Sign in on web to access your Business...',
-                          subtitle:
-                              'Unlimited Projects and Pro features for the who...',
-                          category: 'Team Setup Guide',
-                        ),
-                      ],
-                    ),
-                    for (int i = 1; i < 10; i++)
-                      _DateSection(
-                        label: _dayLabel(i),
-                        isToday: false,
-                        isDark: isDark,
-                        onAddTap: _openAddTask,
+                          const SizedBox(height: 8),
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.accentBlue
+                                  : Colors.transparent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${day.day}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : (isDark ? Colors.white : Colors.black),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                  ],
-                ),
+                    ),
+                  );
+                },
               ),
-            ],
-          );
-        }),
-      ),
+            ),
+
+            const Divider(height: 1),
+
+            // Scrollable Grouped Tasks List
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: onRefresh,
+                child: sortedDates.isEmpty
+                    ? ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.sizeOf(context).height * 0.45,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.event_available_rounded,
+                                    size: 64,
+                                    color: AppColors.textMuted.withOpacity(0.5),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'No upcoming tasks',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: isDark
+                                          ? AppColors.darkTextMuted
+                                          : AppColors.textMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
+                        itemCount: sortedDates.length,
+                      itemBuilder: (context, index) {
+                        final date = sortedDates[index];
+                        final tasks = grouped[date]!;
+
+                        return Column(
+                          key: _dateKeys[date],
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: Text(
+                                _formatDateHeader(date),
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color:
+                                      date.day == selectedDate.day &&
+                                          date.month == selectedDate.month
+                                      ? AppColors.accentBlue
+                                      : textColor,
+                                ),
+                              ),
+                            ),
+                            ...tasks.map(
+                              (task) => AppTaskCard(
+                                title: task.title,
+                                subtitle: task.desc,
+                                time: task.time,
+                                category: task.status,
+                                dotColor: task.priority == 1
+                                    ? AppColors.red
+                                    : task.priority == 2
+                                    ? AppColors.gold
+                                    : task.priority == 3
+                                    ? AppColors.primaryColor
+                                    : null,
+                                isDone: task.isCompleted,
+                                onCheckTap: (v) {
+                                  Get.find<TaskService>().toggleTaskCompletion(
+                                    task.id,
+                                    v,
+                                  );
+                                },
+                                onTap: () => showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (_) => TaskDetailSheet(task: task),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+              ),
+            ),
+          ],
+        );
+      }),
     );
   }
 }
@@ -464,7 +465,6 @@ class _DateSection extends StatelessWidget {
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
-              fontFamily: 'Nunito',
               color: isToday
                   ? AppColors.primaryColor
                   : (isDark ? AppColors.darkTextMuted : AppColors.textMuted),
@@ -522,7 +522,6 @@ class _DateSection extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      fontFamily: 'Nunito',
                       color: isDark
                           ? AppColors.darkTextMuted
                           : AppColors.textMuted,

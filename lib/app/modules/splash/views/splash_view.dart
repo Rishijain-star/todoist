@@ -1,5 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../../../core/const/app_colors.dart';
 import '../controllers/splash_controller.dart';
 
@@ -10,213 +15,178 @@ class SplashView extends StatefulWidget {
   State<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView> with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _scale;
-  late Animation<double> _fade;
+class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
+  late final AnimationController _scaleCtrl;
+  late final AnimationController _rotateCtrl;
+  late final AnimationController _exitFadeCtrl;
+  late final Animation<double> _scale;
+  late final Animation<double> _angle;
+  late final Animation<double> _brandOpacity;
+  late final Animation<double> _exitOpacity;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
-    _scale = CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut);
-    _fade  = CurvedAnimation(parent: _ctrl, curve: const Interval(0.4, 1.0));
-    _ctrl.forward();
-    
-    // Ensure controller is initialized
+    // Scale-up completes in 200ms; full rotation is longer for a smooth, modern feel.
+    _scaleCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _rotateCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _exitFadeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    _scale = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _scaleCtrl, curve: Curves.easeOutCubic),
+    );
+    _angle = Tween<double>(begin: 0, end: 2 * math.pi).animate(
+      CurvedAnimation(parent: _rotateCtrl, curve: Curves.easeInOutCubic),
+    );
+    _brandOpacity = CurvedAnimation(
+      parent: _rotateCtrl,
+      curve: const Interval(0.12, 0.45, curve: Curves.easeOut),
+    );
+    _exitOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _exitFadeCtrl, curve: Curves.easeInOut),
+    );
+
+    _rotateCtrl.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _exitFadeCtrl.forward();
+      }
+    });
+
+    _scaleCtrl.forward();
+    _rotateCtrl.forward();
     Get.find<SplashController>();
   }
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    _scaleCtrl.dispose();
+    _rotateCtrl.dispose();
+    _exitFadeCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.backgroundLight,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // ── Logo Card ──────────────────────────────────
-            ScaleTransition(
-              scale: _scale,
-              child: Image.asset(
-                'assets/taskerer_logo_small.png',
-                width: 120,
-                height: 120,
-              ),
-            ),
-            const SizedBox(height: 24),
+    final bg = isDark ? AppColors.darkBackground : AppColors.backgroundLight;
+    final titleColor =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final taglineColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
 
-            // ── App Name ───────────────────────────────────
-            FadeTransition(
-              opacity: _fade,
+    return Scaffold(
+      backgroundColor: bg,
+      body: AnimatedBuilder(
+        animation: Listenable.merge([
+          _scaleCtrl,
+          _rotateCtrl,
+          _exitFadeCtrl,
+        ]),
+        builder: (context, _) {
+          final scale = _scale.value;
+          final angle = _angle.value;
+          final shellOpacity =
+              _exitFadeCtrl.isDismissed ? 1.0 : _exitOpacity.value;
+
+          return Opacity(
+            opacity: shellOpacity,
+            child: Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        fontFamily: 'Nunito',
+                  Transform.rotate(
+                    angle: angle,
+                    child: Transform.scale(
+                      scale: scale,
+                      alignment: Alignment.center,
+                      child: Image.asset(
+                        'assets/taskerer_logo_small.png',
+                        width: 108.r,
+                        height: 108.r,
+                        filterQuality: FilterQuality.medium,
                       ),
-                      children: [
-                        TextSpan(
-                          text: 'Task',
-                          style: TextStyle(
-                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                          ),
-                        ),
-                        TextSpan(
-                          text: 'erer',
-                          style: TextStyle(color: AppColors.accentBlue),
-                        ),
-                        TextSpan(
-                          text: '.net',
-                          style: TextStyle(
-                            color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Plan It. Track It. Finish It.',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
-                      fontFamily: 'Nunito',
+                  SizedBox(height: 20.h),
+                  FadeTransition(
+                    opacity: _brandOpacity,
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: GoogleFonts.inter(
+                          fontSize: 34.sp,
+                          fontWeight: FontWeight.w800,
+                          height: 1.05,
+                          letterSpacing: -0.5,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Task',
+                            style: TextStyle(color: titleColor),
+                          ),
+                          TextSpan(
+                            text: 'er',
+                            style: TextStyle(color: AppColors.accentBlue),
+                          ),
+                        ],
+                      ),
                     ),
+                  ),
+                  SizedBox(height: 10.h),
+                  FadeTransition(
+                    opacity: _brandOpacity,
+                    child: Text(
+                      'Plan It. Track It. Finish It.',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                        color: taglineColor,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 36.h),
+                  FadeTransition(
+                    opacity: _brandOpacity,
+                    child: const _PulseDots(),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 60),
-
-            // ── Loader dots ───────────────────────────────
-            FadeTransition(
-              opacity: _fade,
-              child: _PulseDots(),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 }
 
-// ── Taskrer Logo SVG ─────────────────────────────────────────────────────────
-class _LogoSVG extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _LogoPainter(),
-    );
-  }
-}
-
-class _LogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-
-    // Calendar body
-    final calPaint = Paint()..color = AppColors.primaryColor;
-    final calRRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(0, h * 0.15, w * 0.75, h * 0.72),
-      const Radius.circular(6),
-    );
-    canvas.drawRRect(calRRect, calPaint);
-
-    // Calendar header bar
-    final headerPaint = Paint()..color = AppColors.primaryDark;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(0, h * 0.15, w * 0.75, h * 0.18), const Radius.circular(6)),
-      headerPaint,
-    );
-
-    // Grid lines
-    final gridPaint = Paint()
-      ..color = Colors.white.withOpacity(0.25)
-      ..strokeWidth = 1;
-    for (int i = 1; i < 4; i++) {
-      double x = (w * 0.75 / 4) * i;
-      canvas.drawLine(Offset(x, h * 0.38), Offset(x, h * 0.87), gridPaint);
-    }
-    for (int i = 1; i < 3; i++) {
-      double y = h * 0.38 + (h * 0.49 / 3) * i;
-      canvas.drawLine(Offset(0, y), Offset(w * 0.75, y), gridPaint);
-    }
-
-    // Bell icon (gold)
-    final bellPaint = Paint()
-      ..color = AppColors.gold
-      ..style = PaintingStyle.fill;
-    final bellPath = Path();
-    final bx = w * 0.58;
-    final by = h * 0.08;
-    bellPath.moveTo(bx + w * 0.15, by + h * 0.18);
-    bellPath.arcTo(
-      Rect.fromCenter(center: Offset(bx + w * 0.15, by + h * 0.25), width: w * 0.22, height: h * 0.22),
-      -3.14, 3.14, false,
-    );
-    bellPath.lineTo(bx + w * 0.06, by + h * 0.38);
-    bellPath.lineTo(bx + w * 0.24, by + h * 0.38);
-    bellPath.close();
-    canvas.drawPath(bellPath, bellPaint);
-
-    // Checkmark
-    final checkPaint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    final cp = Path();
-    cp.moveTo(w * 0.12, h * 0.62);
-    cp.lineTo(w * 0.28, h * 0.74);
-    cp.lineTo(w * 0.55, h * 0.52);
-    canvas.drawPath(cp, checkPaint);
-
-    // Blue notification dot
-    final dotPaint = Paint()..color = AppColors.primaryColor;
-    canvas.drawCircle(Offset(w * 0.86, h * 0.1), w * 0.1, dotPaint);
-    final tPainter = TextPainter(
-      text: const TextSpan(
-        text: '1',
-        style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    tPainter.paint(canvas, Offset(w * 0.82, h * 0.05));
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// ── Animated pulse dots ───────────────────────────────────────────────────────
 class _PulseDots extends StatefulWidget {
+  const _PulseDots();
+
   @override
   State<_PulseDots> createState() => _PulseDotsState();
 }
 
-class _PulseDotsState extends State<_PulseDots> with SingleTickerProviderStateMixin {
+class _PulseDotsState extends State<_PulseDots>
+    with SingleTickerProviderStateMixin {
   late AnimationController _c;
 
   @override
   void initState() {
     super.initState();
-    _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat();
+    _c = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
   }
 
   @override
@@ -239,7 +209,7 @@ class _PulseDotsState extends State<_PulseDots> with SingleTickerProviderStateMi
               height: 6,
               margin: const EdgeInsets.symmetric(horizontal: 3),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(v),
+                color: AppColors.primaryColor.withValues(alpha: v),
                 shape: BoxShape.circle,
               ),
             );

@@ -3,9 +3,10 @@ import 'package:get/get.dart';
 import '../../../routes/app_pages.dart';
 import '../../../core/const/app_colors.dart';
 import '../../../core/widgets/app_widgets.dart';
+import '../../../services/local_storage_services/local_storage_services.dart';
 import '../controllers/browse_controller.dart';
 
-class BrowseView extends StatelessWidget {
+class BrowseView extends GetView<BrowseController> {
   const BrowseView({super.key});
 
   @override
@@ -17,6 +18,8 @@ class BrowseView extends StatelessWidget {
     final iconColor = isDark
         ? AppColors.darkTextSecondary
         : AppColors.textSecondary;
+    final storedName = LocalStorageService().getUserName().trim();
+    final userName = storedName.isEmpty ? 'User' : storedName;
 
     return Scaffold(
       backgroundColor: isDark
@@ -28,155 +31,163 @@ class BrowseView extends StatelessWidget {
             : AppColors.backgroundLight,
         elevation: 0,
         automaticallyImplyLeading: false,
-        titleSpacing: 16,
+        toolbarHeight: 80,
+        titleSpacing: 24,
         title: Row(
           children: [
             // Avatar
             Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkSurfaceElevated
-                    : AppColors.cardSecondary,
+              width: 48,
+              height: 48,
+              decoration: const BoxDecoration(
+                color: AppColors.accentBlue,
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: Icon(
-                  Icons.person_rounded,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.primaryColor,
-                  size: 18,
+                child: Text(
+                  userName[0].toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Text(
-              'Karan Jain',
+              userName,
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
                 color: textColor,
-                fontFamily: 'Nunito',
               ),
             ),
           ],
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.notifications_none_rounded, color: iconColor),
-            onPressed: () => Get.toNamed(Routes.NOTIFICATIONS),
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Row(
+              children: [
+                AppIconButton(
+                  icon: Icon(
+                    Icons.notifications_none_rounded,
+                    size: 24,
+                    color: iconColor,
+                  ),
+                  onTap: () => Get.toNamed(Routes.NOTIFICATIONS),
+                ),
+                const SizedBox(width: 8),
+                AppIconButton(
+                  icon: Icon(
+                    Icons.gps_fixed_rounded,
+                    size: 20,
+                    color: iconColor,
+                  ),
+                  onTap: () {},
+                ),
+              ],
+            ),
           ),
-          IconButton(
-            icon: Icon(Icons.settings_outlined, color: iconColor),
-            onPressed: () => Navigator.pushNamed(context, '/settings'),
-          ),
-          const SizedBox(width: 8),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
           _BrowseItem(
-            icon: Icons.search,
+            icon: Icons.search_rounded,
             label: 'Search',
-            iconColor: AppColors.primaryColor,
+            iconColor: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
           ),
           _BrowseItem(
             icon: Icons.grid_view_rounded,
             label: 'Filters & Labels',
-            iconColor: AppColors.primaryColor,
+            iconColor: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
           ),
           _BrowseItem(
             icon: Icons.check_circle_outline_rounded,
             label: 'Completed',
-            iconColor: AppColors.primaryColor,
+            iconColor: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
           ),
 
-          const SizedBox(height: 16),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Divider(height: 1),
+          ),
 
           _ExpandableHeader(
-            icon: Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkSurfaceElevated
-                    : AppColors.cardSecondary,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.folder_open_rounded,
-                  size: 14,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.primaryColor,
-                ),
-              ),
-            ),
-            label: 'My Projects',
-            onTap: () => Get.toNamed(Routes.BROWSE_PROJECTS),
+            title: 'My Projects',
+            isDark: isDark,
             onAdd: () => Get.toNamed(Routes.BROWSE_ADD_PROJECT),
           ),
+
+          Obx(
+            () {
+              if (controller.projects.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Column(
+                children: controller.projects
+                    .map(
+                      (p) => _ProjectItem(
+                        label: p.name,
+                        count: (p.progress * 10).toInt(),
+                        isDark: isDark,
+                      ),
+                    )
+                    .toList(),
+              );
+            },
+          ),
           _BrowseItem(
-            icon: Icons.edit_outlined,
+            icon: Icons.check_rounded,
             label: 'Manage projects',
-            inset: true,
-            onTap: () => Get.toNamed(Routes.BROWSE_PROJECTS),
+            iconColor: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+            fontSize: 14,
+            onTap: () => Get.to(() => const MyProjectsView()),
           ),
 
-          const SizedBox(height: 16),
-
-          _ExpandableHeader(
-            icon: Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: AppColors.accentBlue,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Center(
-                child: Text(
-                  'G',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-            ),
-            label: 'G5tc',
-            onTap: () {},
-            onAdd: () {},
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Divider(height: 1),
           ),
-          _BrowseItem(
-            icon: Icons.tag,
-            label: 'Team Setup Guide',
-            trailing: const Text(
-              '26',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 13),
-            ),
-            inset: true,
-          ),
-          _BrowseItem(
-            icon: Icons.grid_view_outlined,
-            label: 'Browse all projects',
-            inset: true,
-          ),
-
-          const SizedBox(height: 24),
 
           _BrowseItem(
-            icon: Icons.style_outlined,
+            icon: Icons.hub_outlined,
+            label: 'Add a team',
+            iconColor: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
+            onTap: () => Get.toNamed(Routes.TEAM),
+          ),
+          _BrowseItem(
+            icon: Icons.star_outline_rounded,
             label: 'Browse templates',
-            onTap: () => Get.toNamed(Routes.BROWSE_TEMPLATES),
+            iconColor: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
+            onTap: () {
+              // Navigate to a temporary view or the ProjectsView itself
+              // but since ProjectsView is part of Dashboard, we might just
+              // show the templates in a bottom sheet or a new page.
+              // For now, I'll show the ProjectsView content in a new page
+              // to allow template selection.
+              Get.toNamed(Routes.BROWSE_TEMPLATES);
+            },
           ),
           _BrowseItem(
-            icon: Icons.help_outline_rounded,
+            icon: Icons.info_outline_rounded,
             label: 'Help & resources',
+            iconColor: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
           ),
         ],
       ),
@@ -187,17 +198,15 @@ class BrowseView extends StatelessWidget {
 class _BrowseItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  final Color? iconColor;
-  final Widget? trailing;
-  final bool inset;
+  final Color iconColor;
+  final double fontSize;
   final VoidCallback? onTap;
 
   const _BrowseItem({
     required this.icon,
     required this.label,
-    this.iconColor,
-    this.trailing,
-    this.inset = false,
+    required this.iconColor,
+    this.fontSize = 16,
     this.onTap,
   });
 
@@ -207,33 +216,21 @@ class _BrowseItem extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(inset ? 52 : 16, 12, 16, 12),
+        padding: const EdgeInsets.fromLTRB(24, 14, 24, 14),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color:
-                  iconColor ??
-                  (isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.textSecondary),
-              size: 22,
-            ),
+            Icon(icon, color: iconColor, size: 24),
             const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? AppColors.darkTextPrimary
-                      : AppColors.textPrimary,
-                  fontFamily: 'Nunito',
-                ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.w600,
+                color: isDark
+                    ? AppColors.darkTextPrimary
+                    : AppColors.textPrimary,
               ),
             ),
-            if (trailing != null) trailing!,
           ],
         ),
       ),
@@ -242,59 +239,109 @@ class _BrowseItem extends StatelessWidget {
 }
 
 class _ExpandableHeader extends StatelessWidget {
-  final Widget icon;
-  final String label;
-  final VoidCallback onAdd;
-  final VoidCallback? onTap;
+  final String title;
+  final bool isDark;
+  final VoidCallback? onAdd;
 
   const _ExpandableHeader({
-    required this.icon,
-    required this.label,
-    required this.onAdd,
-    this.onTap,
+    required this.title,
+    required this.isDark,
+    this.onAdd,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 16, 16, 8),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            ),
+          ),
+          const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.add, size: 20),
+            onPressed: onAdd,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
+          ),
+          const SizedBox(width: 12),
+          Icon(
+            Icons.keyboard_arrow_down_rounded,
+            size: 20,
+            color: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.textSecondary,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProjectItem extends StatelessWidget {
+  final String label;
+  final int count;
+  final bool isDark;
+
+  const _ProjectItem({
+    required this.label,
+    required this.count,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: () {},
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: Row(
           children: [
-            icon,
+            Icon(
+              Icons.tag_rounded,
+              color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+              size: 22,
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                   color: isDark
                       ? AppColors.darkTextPrimary
                       : AppColors.textPrimary,
-                  fontFamily: 'Nunito',
                 ),
               ),
             ),
-            IconButton(
-              visualDensity: VisualDensity.compact,
-              icon: Icon(
-                Icons.add,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+              decoration: BoxDecoration(
                 color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.textSecondary,
-                size: 20,
+                    ? AppColors.darkSurfaceElevated
+                    : AppColors.cardSecondary,
+                borderRadius: BorderRadius.circular(12),
               ),
-              onPressed: onAdd,
-            ),
-            Icon(
-              Icons.keyboard_arrow_up_rounded,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.textSecondary,
-              size: 20,
+              child: Text(
+                count.toString(),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
+                ),
+              ),
             ),
           ],
         ),
@@ -320,7 +367,9 @@ class MyProjectsView extends GetView<BrowseController> {
           ? AppColors.darkBackground
           : AppColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.darkBackground : Colors.white,
+        backgroundColor: isDark
+            ? AppColors.darkBackground
+            : AppColors.backgroundLight,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -332,7 +381,6 @@ class MyProjectsView extends GetView<BrowseController> {
             fontSize: 18,
             fontWeight: FontWeight.w700,
             color: titleColor,
-            fontFamily: 'Nunito',
           ),
         ),
         actions: [
@@ -356,12 +404,7 @@ class MyProjectsView extends GetView<BrowseController> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed(Routes.BROWSE_ADD_PROJECT),
-        backgroundColor: AppColors.primaryColor,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+      // FAB removed from here because it's already in DashboardView for this tab
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -389,7 +432,6 @@ class MyProjectsView extends GetView<BrowseController> {
                         style: TextStyle(
                           fontSize: 13,
                           color: hintColor,
-                          fontFamily: 'Nunito',
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -421,7 +463,6 @@ class MyProjectsView extends GetView<BrowseController> {
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
                           color: titleColor,
-                          fontFamily: 'Nunito',
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -540,7 +581,6 @@ class MyProjectsView extends GetView<BrowseController> {
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                       color: titleColor,
-                                      fontFamily: 'Nunito',
                                     ),
                                   ),
                                 ),
@@ -590,7 +630,6 @@ class ProjectDetailView extends StatelessWidget {
             fontSize: 18,
             fontWeight: FontWeight.w700,
             color: titleColor,
-            fontFamily: 'Nunito',
           ),
         ),
         actions: [
@@ -621,7 +660,6 @@ class ProjectDetailView extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
                     color: titleColor,
-                    fontFamily: 'Nunito',
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -690,7 +728,6 @@ class ProjectDetailView extends StatelessWidget {
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: muted,
-                      fontFamily: 'Nunito',
                     ),
                   ),
                 ],
@@ -762,7 +799,6 @@ class _TemplateInstructionCard extends StatelessWidget {
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: titleColor,
-              fontFamily: 'Nunito',
               height: 1.5,
             ),
           ),
@@ -819,7 +855,6 @@ class _ProjectsEmptyState extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: titleColor,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 8),
@@ -830,7 +865,6 @@ class _ProjectsEmptyState extends StatelessWidget {
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: muted,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 18),
@@ -991,9 +1025,13 @@ class _AddProjectViewState extends State<AddProjectView> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
     final c = Get.find<BrowseController>();
-    c.addProject(name: _nameCtrl.text, favorite: _favorite, layout: _layout);
+    await c.addProject(
+      name: _nameCtrl.text,
+      favorite: _favorite,
+      layout: _layout,
+    );
     Get.back();
   }
 
@@ -1023,7 +1061,6 @@ class _AddProjectViewState extends State<AddProjectView> {
             fontSize: 18,
             fontWeight: FontWeight.w700,
             color: titleColor,
-            fontFamily: 'Nunito',
           ),
         ),
         actions: [
@@ -1039,8 +1076,8 @@ class _AddProjectViewState extends State<AddProjectView> {
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1049,12 +1086,16 @@ class _AddProjectViewState extends State<AddProjectView> {
                 onChanged: (_) => setState(() {}),
                 style: TextStyle(
                   color: titleColor,
-                  fontFamily: 'Nunito',
                   fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  height: 1.35,
                 ),
                 decoration: InputDecoration(
                   hintText: 'Name',
-                  hintStyle: TextStyle(color: muted, fontFamily: 'Nunito'),
+                  hintStyle: TextStyle(
+                    color: muted,
+                    fontSize: 15,
+                  ),
                   filled: true,
                   fillColor: card,
                   border: OutlineInputBorder(
@@ -1126,7 +1167,6 @@ class _AddProjectViewState extends State<AddProjectView> {
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: titleColor,
-                        fontFamily: 'Nunito',
                       ),
                     ),
                   ),
@@ -1144,7 +1184,6 @@ class _AddProjectViewState extends State<AddProjectView> {
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
                   color: titleColor,
-                  fontFamily: 'Nunito',
                 ),
               ),
               const SizedBox(height: 12),
@@ -1178,7 +1217,7 @@ class _AddProjectViewState extends State<AddProjectView> {
                   ),
                 ],
               ),
-              const Spacer(),
+              const SizedBox(height: 32),
               if (_nameCtrl.text.trim().isNotEmpty)
                 GradientButton(
                   label: 'Create project',
@@ -1242,7 +1281,6 @@ class _SettingRow extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: titleColor,
-                      fontFamily: 'Nunito',
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -1252,7 +1290,6 @@ class _SettingRow extends StatelessWidget {
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
                       color: subColor,
-                      fontFamily: 'Nunito',
                     ),
                   ),
                 ],
@@ -1318,7 +1355,6 @@ class _LayoutOption extends StatelessWidget {
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                   color: selected ? AppColors.primaryColor : titleColor,
-                  fontFamily: 'Nunito',
                 ),
               ),
             ],

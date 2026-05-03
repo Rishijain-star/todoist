@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../../../core/const/app_colors.dart';
 import '../../../core/widgets/app_widgets.dart';
 import '../controllers/onboarding_controller.dart';
-import '../../../routes/app_pages.dart';
 
 class OnboardingNameView extends GetView<OnboardingController> {
   const OnboardingNameView({super.key});
@@ -37,7 +36,6 @@ class OnboardingNameView extends GetView<OnboardingController> {
                   color: isDark
                       ? AppColors.darkTextSecondary
                       : AppColors.textSecondary,
-                  fontFamily: 'Nunito',
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -49,18 +47,22 @@ class OnboardingNameView extends GetView<OnboardingController> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: EdgeInsets.fromLTRB(
+            24,
+            20,
+            24,
+            24 + MediaQuery.viewPaddingOf(context).bottom,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
               RichText(
                 text: TextSpan(
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'Nunito',
                     color: textColor,
                   ),
                   children: [
@@ -80,7 +82,6 @@ class OnboardingNameView extends GetView<OnboardingController> {
                   color: isDark
                       ? AppColors.darkTextSecondary
                       : AppColors.textSecondary,
-                  fontFamily: 'Nunito',
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -195,7 +196,6 @@ class OnboardingNameView extends GetView<OnboardingController> {
                             color: isDark
                                 ? Colors.white
                                 : AppColors.primaryColor,
-                            fontFamily: 'Nunito',
                           ),
                         ),
                       ],
@@ -211,7 +211,6 @@ class OnboardingNameView extends GetView<OnboardingController> {
                   fontWeight: FontWeight.w800,
                   color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                   letterSpacing: 1.2,
-                  fontFamily: 'Nunito',
                 ),
               ),
               const SizedBox(height: 8),
@@ -220,11 +219,13 @@ class OnboardingNameView extends GetView<OnboardingController> {
                 style: TextStyle(
                   color: textColor,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Nunito',
+                  fontSize: 16,
+                  height: 1.35,
                 ),
                 decoration: InputDecoration(
                   hintText: 'Enter your full name',
                   hintStyle: TextStyle(
+                    fontSize: 15,
                     color: isDark
                         ? AppColors.darkTextMuted
                         : AppColors.textMuted,
@@ -239,30 +240,26 @@ class OnboardingNameView extends GetView<OnboardingController> {
                   ),
                 ),
               ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: controller.submitName,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 0,
+              const SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: controller.submitName,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  minimumSize: const Size(double.infinity, 54),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Text(
-                    'Next →',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Next →',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
             ],
           ),
         ),

@@ -1,26 +1,93 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../const/app_colors.dart';
 
 class AppTheme {
   AppTheme._();
 
+  /// Inter-based text theme. Semantic roles: display/headline ≈ heading, title ≈ subheading,
+  /// body* ≈ body, bodySmall/labelSmall ≈ secondary.
+  static TextTheme _interTextTheme({
+    required Color onSurface,
+    required Color labelSecondary,
+    required Color muted,
+  }) {
+    return TextTheme(
+      displayLarge: GoogleFonts.inter(
+        color: onSurface,
+        fontSize: 32.sp,
+        fontWeight: FontWeight.w800,
+      ),
+      displayMedium: GoogleFonts.inter(
+        color: onSurface,
+        fontSize: 28.sp,
+        fontWeight: FontWeight.w800,
+      ),
+      displaySmall: GoogleFonts.inter(
+        color: onSurface,
+        fontSize: 24.sp,
+        fontWeight: FontWeight.w800,
+      ),
+      headlineMedium: GoogleFonts.inter(
+        color: onSurface,
+        fontSize: 20.sp,
+        fontWeight: FontWeight.w700,
+      ),
+      titleLarge: GoogleFonts.inter(
+        color: onSurface,
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w700,
+      ),
+      titleMedium: GoogleFonts.inter(
+        color: onSurface,
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w600,
+      ),
+      bodyLarge: GoogleFonts.inter(
+        color: onSurface,
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w500,
+      ),
+      bodyMedium: GoogleFonts.inter(
+        color: onSurface,
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+      ),
+      bodySmall: GoogleFonts.inter(
+        color: muted,
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w400,
+        height: 1.45,
+      ),
+      labelLarge: GoogleFonts.inter(
+        color: labelSecondary,
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w600,
+      ),
+      labelSmall: GoogleFonts.inter(
+        color: muted,
+        fontSize: 11.sp,
+        fontWeight: FontWeight.w500,
+        height: 1.4,
+      ),
+    );
+  }
+
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    fontFamily: 'Nunito',
-    colorScheme: const ColorScheme(
-      brightness: Brightness.light,
-      primary:    AppColors.primaryColor,
-      onPrimary:  AppColors.white,
-      secondary:  AppColors.accentBlue,
+    fontFamily: GoogleFonts.inter().fontFamily,
+    colorScheme: ColorScheme.light(
+      primary: AppColors.brandPrimary,
+      onPrimary: AppColors.white,
+      secondary: AppColors.brandAccent,
       onSecondary: AppColors.white,
-      background: AppColors.backgroundLight,
-      onBackground: AppColors.textPrimary,
-      surface:    AppColors.card,
-      onSurface:  AppColors.textPrimary,
-      error:      AppColors.red,
-      onError:    AppColors.white,
+      surface: AppColors.surface,
+      onSurface: AppColors.textPrimary,
+      error: AppColors.semanticError,
+      onError: AppColors.white,
     ),
     scaffoldBackgroundColor: AppColors.backgroundLight,
     appBarTheme: const AppBarTheme(
@@ -34,107 +101,113 @@ class AppTheme {
       ),
     ),
     cardTheme: CardThemeData(
-      color: AppColors.card,
+      color: AppColors.surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.borderLight),
+        borderRadius: BorderRadius.circular(16.r),
+        side: const BorderSide(color: AppColors.borderDefault),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: AppColors.brandPrimary,
         foregroundColor: AppColors.white,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+        textStyle: GoogleFonts.inter(
+          fontSize: 15.sp,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.textPrimary,
-        side: const BorderSide(color: AppColors.borderLight, width: 1.5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
+        side: const BorderSide(color: AppColors.borderDefault, width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
+        textStyle: GoogleFonts.inter(
+          fontSize: 15.sp,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: AppColors.accentBlue,
-        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
+        foregroundColor: AppColors.brandAccent,
+        textStyle: GoogleFonts.inter(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.inputFieldBg,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.borderLight),
+        borderRadius: BorderRadius.circular(12.r),
+        borderSide: const BorderSide(color: AppColors.borderDefault),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.borderLight),
+        borderRadius: BorderRadius.circular(12.r),
+        borderSide: const BorderSide(color: AppColors.borderDefault),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primaryColor, width: 1.5),
+        borderRadius: BorderRadius.circular(12.r),
+        borderSide: const BorderSide(color: AppColors.brandPrimary, width: 1.5),
       ),
-      hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14, fontFamily: 'Nunito'),
-      labelStyle: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Nunito'),
+      hintStyle: GoogleFonts.inter(
+        color: AppColors.textMuted,
+        fontSize: 14.sp,
+      ),
+      labelStyle: GoogleFonts.inter(
+        color: AppColors.textSecondary,
+        fontSize: 14.sp,
+      ),
     ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: AppColors.card,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: AppColors.surface,
       elevation: 0,
-      selectedItemColor: AppColors.primaryColor,
+      selectedItemColor: AppColors.brandPrimary,
       unselectedItemColor: AppColors.textMuted,
-      selectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
-      unselectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, fontFamily: 'Nunito'),
+      selectedLabelStyle: GoogleFonts.inter(
+        fontSize: 10.sp,
+        fontWeight: FontWeight.w700,
+      ),
+      unselectedLabelStyle: GoogleFonts.inter(
+        fontSize: 10.sp,
+        fontWeight: FontWeight.w600,
+      ),
       type: BottomNavigationBarType.fixed,
     ),
-    dividerTheme: const DividerThemeData(color: AppColors.borderLight, thickness: 1, space: 0),
-    textTheme: const TextTheme(
-      displayLarge:  TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800, fontFamily: 'Nunito'),
-      displayMedium: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800, fontFamily: 'Nunito'),
-      headlineLarge: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
-      headlineMedium:TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
-      titleLarge:    TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 20, fontFamily: 'Nunito'),
-      titleMedium:   TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 16, fontFamily: 'Nunito'),
-      titleSmall:    TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, fontSize: 14, fontFamily: 'Nunito'),
-      bodyLarge:     TextStyle(color: AppColors.textPrimary, fontSize: 15, fontFamily: 'Nunito'),
-      bodyMedium:    TextStyle(color: AppColors.textSecondary, fontSize: 13.5, fontFamily: 'Nunito'),
-      bodySmall:     TextStyle(color: AppColors.textMuted, fontSize: 12, fontFamily: 'Nunito'),
-      labelLarge:    TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 13, fontFamily: 'Nunito'),
-      labelMedium:   TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600, fontSize: 12, fontFamily: 'Nunito'),
-      labelSmall:    TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.w600, fontSize: 10, fontFamily: 'Nunito'),
+    dividerTheme:
+        const DividerThemeData(color: AppColors.borderDefault, thickness: 1, space: 0),
+    textTheme: _interTextTheme(
+      onSurface: AppColors.textPrimary,
+      labelSecondary: AppColors.textSecondary,
+      muted: AppColors.textMuted,
     ),
   );
 
-  // ─── DARK THEME ───────────────────────────────────────────────────────────
-  static ThemeData darkTheme = ThemeData(
-    useMaterial3: true,
+  static ThemeData darkTheme = lightTheme.copyWith(
     brightness: Brightness.dark,
-    fontFamily: 'Nunito',
-    colorScheme: const ColorScheme(
-      brightness: Brightness.dark,
-      primary:    AppColors.primaryColor,
-      onPrimary:  AppColors.white,
-      secondary:  AppColors.accentBlue,
+    colorScheme: ColorScheme.dark(
+      primary: AppColors.brandPrimary,
+      onPrimary: AppColors.white,
+      secondary: AppColors.brandAccent,
       onSecondary: AppColors.white,
-      background: AppColors.darkBackground,
-      onBackground: AppColors.darkTextPrimary,
-      surface:    AppColors.darkSurface,
-      onSurface:  AppColors.darkTextPrimary,
-      error:      AppColors.red,
-      onError:    AppColors.white,
+      surface: AppColors.darkSurface,
+      onSurface: AppColors.darkTextPrimary,
+      error: AppColors.semanticError,
+      onError: AppColors.white,
     ),
     scaffoldBackgroundColor: AppColors.darkBackground,
     appBarTheme: const AppBarTheme(
       elevation: 0,
       scrolledUnderElevation: 0,
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: Colors.transparent,
       foregroundColor: AppColors.darkTextPrimary,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -145,78 +218,54 @@ class AppTheme {
       color: AppColors.darkSurface,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         side: const BorderSide(color: AppColors.darkBorder),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: AppColors.brandPrimary,
         foregroundColor: AppColors.white,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.darkTextPrimary,
-        side: const BorderSide(color: AppColors.darkBorder, width: 1.5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
-      ),
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: AppColors.accentBlue,
-        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+        textStyle: GoogleFonts.inter(
+          fontSize: 15.sp,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.darkSurfaceElevated,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      fillColor: AppColors.darkSurface,
+      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         borderSide: const BorderSide(color: AppColors.darkBorder),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         borderSide: const BorderSide(color: AppColors.darkBorder),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primaryColor, width: 1.5),
+        borderRadius: BorderRadius.circular(12.r),
+        borderSide: const BorderSide(color: AppColors.brandPrimary, width: 1.5),
       ),
-      hintStyle: const TextStyle(color: AppColors.darkTextMuted, fontSize: 14, fontFamily: 'Nunito'),
-      labelStyle: const TextStyle(color: AppColors.darkTextSecondary, fontFamily: 'Nunito'),
+      hintStyle: GoogleFonts.inter(
+        color: AppColors.darkTextMuted,
+        fontSize: 14.sp,
+      ),
+      labelStyle: GoogleFonts.inter(
+        color: AppColors.darkTextSecondary,
+        fontSize: 14.sp,
+      ),
     ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: AppColors.darkSurface,
-      elevation: 0,
-      selectedItemColor: AppColors.primaryColor,
-      unselectedItemColor: AppColors.darkTextMuted,
-      selectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
-      unselectedLabelStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, fontFamily: 'Nunito'),
-      type: BottomNavigationBarType.fixed,
-    ),
-    dividerTheme: const DividerThemeData(color: AppColors.darkBorder, thickness: 1, space: 0),
-    textTheme: const TextTheme(
-      displayLarge:  TextStyle(color: AppColors.darkTextPrimary, fontWeight: FontWeight.w800, fontFamily: 'Nunito'),
-      displayMedium: TextStyle(color: AppColors.darkTextPrimary, fontWeight: FontWeight.w800, fontFamily: 'Nunito'),
-      headlineLarge: TextStyle(color: AppColors.darkTextPrimary, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
-      headlineMedium:TextStyle(color: AppColors.darkTextPrimary, fontWeight: FontWeight.w700, fontFamily: 'Nunito'),
-      titleLarge:    TextStyle(color: AppColors.darkTextPrimary, fontWeight: FontWeight.w700, fontSize: 20, fontFamily: 'Nunito'),
-      titleMedium:   TextStyle(color: AppColors.darkTextPrimary, fontWeight: FontWeight.w600, fontSize: 16, fontFamily: 'Nunito'),
-      titleSmall:    TextStyle(color: AppColors.darkTextPrimary, fontWeight: FontWeight.w600, fontSize: 14, fontFamily: 'Nunito'),
-      bodyLarge:     TextStyle(color: AppColors.darkTextPrimary, fontSize: 15, fontFamily: 'Nunito'),
-      bodyMedium:    TextStyle(color: AppColors.darkTextSecondary, fontSize: 13.5, fontFamily: 'Nunito'),
-      bodySmall:     TextStyle(color: AppColors.darkTextMuted, fontSize: 12, fontFamily: 'Nunito'),
-      labelLarge:    TextStyle(color: AppColors.darkTextPrimary, fontWeight: FontWeight.w700, fontSize: 13, fontFamily: 'Nunito'),
-      labelMedium:   TextStyle(color: AppColors.darkTextSecondary, fontWeight: FontWeight.w600, fontSize: 12, fontFamily: 'Nunito'),
-      labelSmall:    TextStyle(color: AppColors.darkTextMuted, fontWeight: FontWeight.w600, fontSize: 10, fontFamily: 'Nunito'),
+    dividerTheme:
+        const DividerThemeData(color: AppColors.darkBorder, thickness: 1, space: 0),
+    textTheme: _interTextTheme(
+      onSurface: AppColors.darkTextPrimary,
+      labelSecondary: AppColors.darkTextSecondary,
+      muted: AppColors.darkTextMuted,
     ),
   );
 }

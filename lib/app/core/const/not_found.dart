@@ -1,6 +1,6 @@
-
 import 'app_colors.dart';
 import 'export.dart';
+import '../../routes/app_pages.dart';
 
 class Error404Page extends StatelessWidget {
   const Error404Page({super.key});
@@ -27,7 +27,7 @@ class Error404Page extends StatelessWidget {
                       blurRadius: 10,
                       color: Colors.black26,
                       offset: Offset(3, 3),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -50,10 +50,7 @@ class Error404Page extends StatelessWidget {
               // Subtitle
               Text(
                 "The page you are looking for doesn’t exist or has been moved.",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
 
@@ -62,19 +59,24 @@ class Error404Page extends StatelessWidget {
               // Action Button
               ElevatedButton(
                 onPressed: () {
-                  // Get.offAllNamed(Routes.DASHBOARD);
+                  Get.offAllNamed(Routes.DASHBOARD);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:AppColors.primaryColor,
+                  backgroundColor: AppColors.primaryColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 14,
+                  ),
                 ),
                 child: Text(
                   "common.go_home".tr,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
 
@@ -83,14 +85,15 @@ class Error404Page extends StatelessWidget {
               // Optional Back Button
               TextButton(
                 onPressed: () {
-                 // Get.offAllNamed(Routes.DASHBOARD);
+                  if (Navigator.of(context).canPop()) {
+                    Get.back();
+                  } else {
+                    Get.offAllNamed(Routes.DASHBOARD);
+                  }
                 },
                 child: Text(
                   "common.back".tr,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.blueGrey,
-                  ),
+                  style: const TextStyle(fontSize: 15, color: Colors.blueGrey),
                 ),
               ),
             ],
@@ -126,7 +129,7 @@ class Error500Page extends StatelessWidget {
                       blurRadius: 10,
                       color: Colors.black26,
                       offset: Offset(3, 3),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -149,10 +152,7 @@ class Error500Page extends StatelessWidget {
               // Subtitle
               Text(
                 "It seems there’s a problem with the server. Please try again later.",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
 
@@ -161,8 +161,7 @@ class Error500Page extends StatelessWidget {
               // Retry Button
               ElevatedButton(
                 onPressed: () {
-                  // You can reload or go home
-                  // Get.offAllNamed(Routes.DASHBOARD);
+                  Get.offAllNamed(Routes.DASHBOARD);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryColor,
@@ -185,14 +184,15 @@ class Error500Page extends StatelessWidget {
               // Optional Retry link
               TextButton(
                 onPressed: () {
-                  // Get.offAllNamed(Routes.DASHBOARD);
+                  if (Navigator.of(context).canPop()) {
+                    Get.back();
+                  } else {
+                    Get.offAllNamed(Routes.DASHBOARD);
+                  }
                 },
                 child: const Text(
                   "Try Again",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.blueGrey,
-                  ),
+                  style: TextStyle(fontSize: 15, color: Colors.blueGrey),
                 ),
               ),
             ],
@@ -202,7 +202,6 @@ class Error500Page extends StatelessWidget {
     );
   }
 }
-
 
 class NoInternetPage extends StatelessWidget {
   const NoInternetPage({super.key});
@@ -255,16 +254,21 @@ class NoInternetPage extends StatelessWidget {
               // 🔁 Retry Button
               ElevatedButton.icon(
                 onPressed: () {
-                  // Try reconnect logic here or reload current route
-                  // Get.offAllNamed(Routes.SPLASH);
+                  if (Navigator.of(context).canPop()) {
+                    Get.back();
+                  } else {
+                    Get.offAllNamed(Routes.SPLASH);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 14,
+                  ),
                 ),
                 icon: const Icon(Icons.refresh, color: Colors.white),
                 label: const Text(
@@ -278,14 +282,11 @@ class NoInternetPage extends StatelessWidget {
               // 🏠 Go Home Button
               TextButton(
                 onPressed: () {
-                  // Get.offAllNamed(Routes.DASHBOARD);
+                  Get.offAllNamed(Routes.DASHBOARD);
                 },
                 child: const Text(
                   "Go to Home",
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.blueGrey,
-                  ),
+                  style: TextStyle(fontSize: 15, color: Colors.blueGrey),
                 ),
               ),
             ],

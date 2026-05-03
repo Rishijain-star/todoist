@@ -417,13 +417,19 @@ class StyledTextBuilder {
       .._maxLines = maxLines ?? _maxLines;
   }
 
-  Text make() => Text(
-    text,
-    style: _style,
-    textAlign: _textAlign,
-    overflow: _overflow,
-    maxLines: _maxLines,
-  );
+  Text make() {
+    String processedText = text;
+    if (text.length > 300) {
+      processedText = '${text.substring(0, 300)}...';
+    }
+    return Text(
+      processedText,
+      style: _style,
+      textAlign: _textAlign,
+      overflow: _overflow ?? TextOverflow.ellipsis,
+      maxLines: _maxLines,
+    );
+  }
 }
 
 //padding extension

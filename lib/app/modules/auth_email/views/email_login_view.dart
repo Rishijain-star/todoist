@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../../../core/config/dev_auth_config.dart';
 import '../../../core/const/app_colors.dart';
 import '../../../core/widgets/app_widgets.dart';
+import '../../../data/api_repository.dart';
 import '../../../routes/app_pages.dart';
-import '../../../services/secure_token_service/secure_token_service.dart';
+import '../../../services/api_progress_service.dart';
 import '../../../services/local_storage_services/local_storage_services.dart';
 
 class EmailLoginView extends StatefulWidget {
@@ -26,24 +29,43 @@ class _EmailLoginViewState extends State<EmailLoginView> {
   }
 
   Future<void> _login() async {
-    final email = _emailCtrl.text.trim();
-    // final password = _passCtrl.text.trim();
+    // TODO(dev): Remove this block when backend login is required — see [DevAuthConfig].
+    if (DevAuthConfig.shouldBypassAuth) {
+      DevAuthConfig.navigateAfterLoggedIn();
+      return;
+    }
 
-    // Strict static credentials as requested
-    if (email == 'admin@user.com' || email == 'user@user.com') {
-      setState(() => _loading = true);
-      await SecureTokenService().setAuthToken('token');
-      await LocalStorageService().setEmailId(email);
-      if (mounted) {
-        Get.offAllNamed(Routes.ONBOARDING_WELCOME);
-      }
+    final email = _emailCtrl.text.trim();
+    final password = _passCtrl.text.trim();
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email and password required')),
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
+    final api = ApiProgressService.tryGet();
+    api?.showIndeterminate('Signing in…');
+    bool ok = false;
+    try {
+      ok = await ApiRepository.login(email: email, password: password);
+    } finally {
+      api?.hide();
+    }
+    if (!mounted) return;
+    setState(() => _loading = false);
+
+    if (ok) {
+      final isOnboardingCompleted = LocalStorageService()
+          .getIsOnboardingCompleted();
+      Get.offAllNamed(
+        isOnboardingCompleted ? Routes.DASHBOARD : Routes.ONBOARDING_WELCOME,
+      );
     } else {
-      // Don't log in for other credentials
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Invalid credentials. Use admin@user.com or user@user.com.',
-          ),
+          content: Text('Login failed. Check credentials/API URL.'),
         ),
       );
     }
@@ -80,7 +102,6 @@ class _EmailLoginViewState extends State<EmailLoginView> {
                 fontSize: 32,
                 fontWeight: FontWeight.w800,
                 color: textColor,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 8),
@@ -90,7 +111,6 @@ class _EmailLoginViewState extends State<EmailLoginView> {
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: textColor,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 40),
@@ -125,6 +145,7 @@ class _EmailLoginViewState extends State<EmailLoginView> {
             GradientButton(
               label: 'Log in',
               onPressed: _loading ? null : _login,
+              isLoading: _loading,
             ),
 
             const SizedBox(height: 20),
@@ -137,7 +158,6 @@ class _EmailLoginViewState extends State<EmailLoginView> {
                     color: textColor,
                     fontWeight: FontWeight.w600,
                     decoration: TextDecoration.underline,
-                    fontFamily: 'Nunito',
                   ),
                 ),
               ),
@@ -155,7 +175,6 @@ class _AuthTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final Widget? suffixIcon;
-  final bool isError;
 
   const _AuthTextField({
     required this.controller,
@@ -163,7 +182,6 @@ class _AuthTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.suffixIcon,
-    this.isError = false,
   });
 
   @override
@@ -177,9 +195,7 @@ class _AuthTextField extends StatelessWidget {
             color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isError
-                  ? AppColors.red
-                  : (isDark ? AppColors.darkBorder : AppColors.borderLight),
+              color: isDark ? AppColors.darkBorder : AppColors.borderLight,
               width: 1.5,
             ),
           ),
@@ -189,14 +205,13 @@ class _AuthTextField extends StatelessWidget {
             keyboardType: keyboardType,
             style: TextStyle(
               color: isDark ? Colors.white : Colors.black,
-              fontFamily: 'Nunito',
+              fontSize: 16.sp,
             ),
+            strutStyle: StrutStyle(fontSize: 16.sp, forceStrutHeight: true),
             decoration: InputDecoration(
               labelText: label,
               labelStyle: TextStyle(
-                color: isError
-                    ? AppColors.red
-                    : (isDark ? AppColors.darkTextMuted : AppColors.textMuted),
+                color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
                 fontSize: 14,
               ),
               floatingLabelBehavior: FloatingLabelBehavior.auto,
@@ -232,14 +247,29 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
   }
 
   Future<void> _send() async {
+    final email = _emailCtrl.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      Get.snackbar(
+        'Invalid email',
+        'Please enter a valid email address.',
+        backgroundColor: AppColors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
+
     setState(() => _sending = true);
-    await Future.delayed(const Duration(milliseconds: 1100));
+    final ok = await ApiRepository.forgotPassword(email: email);
     if (!mounted) return;
     setState(() => _sending = false);
     Get.snackbar(
-      'Reset link sent',
-      'Check your email to reset your password.',
-      backgroundColor: AppColors.primaryColor,
+      ok ? 'Reset link sent' : 'Request failed',
+      ok
+          ? 'Check your email to reset your password.'
+          : 'Please try again in a moment.',
+      backgroundColor: ok ? AppColors.primaryColor : AppColors.red,
       colorText: Colors.white,
       snackPosition: SnackPosition.BOTTOM,
       margin: const EdgeInsets.all(16),
@@ -270,7 +300,6 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             fontSize: 17,
             fontWeight: FontWeight.w700,
             color: textColor,
-            fontFamily: 'Nunito',
           ),
         ),
         centerTitle: true,
@@ -287,7 +316,6 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                 fontSize: 28,
                 fontWeight: FontWeight.w800,
                 color: textColor,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 10),
@@ -299,7 +327,6 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                 color: isDark
                     ? AppColors.darkTextSecondary
                     : AppColors.textSecondary,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 34),

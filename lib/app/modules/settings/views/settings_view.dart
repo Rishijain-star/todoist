@@ -45,7 +45,6 @@ class _SettingsViewState extends State<SettingsView> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w800,
-            fontFamily: 'Nunito',
             color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
           ),
         ),
@@ -80,7 +79,6 @@ class _SettingsViewState extends State<SettingsView> {
                           color: Colors.white,
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
-                          fontFamily: 'Nunito',
                         ),
                       ),
                     ),
@@ -97,7 +95,6 @@ class _SettingsViewState extends State<SettingsView> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
-                            fontFamily: 'Nunito',
                             color: isDark
                                 ? AppColors.darkTextPrimary
                                 : AppColors.textPrimary,
@@ -111,7 +108,6 @@ class _SettingsViewState extends State<SettingsView> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            fontFamily: 'Nunito',
                             color: isDark
                                 ? AppColors.darkTextSecondary
                                 : AppColors.textSecondary,
@@ -139,7 +135,6 @@ class _SettingsViewState extends State<SettingsView> {
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         color: AppColors.gold,
-                        fontFamily: 'Nunito',
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -200,7 +195,6 @@ class _SettingsViewState extends State<SettingsView> {
                               fontSize: 14,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
-                              fontFamily: 'Nunito',
                             ),
                           ),
                           Text(
@@ -209,7 +203,6 @@ class _SettingsViewState extends State<SettingsView> {
                               fontSize: 11.5,
                               fontWeight: FontWeight.w500,
                               color: Colors.white.withOpacity(0.8),
-                              fontFamily: 'Nunito',
                             ),
                           ),
                         ],
@@ -382,7 +375,6 @@ class _SettingsViewState extends State<SettingsView> {
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryColor,
-                  fontFamily: 'Nunito',
                 ),
               ),
             ),
@@ -410,7 +402,6 @@ class _SectionLabel extends StatelessWidget {
           fontSize: 10,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.4,
-          fontFamily: 'Nunito',
           color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
         ),
       ),
@@ -476,7 +467,6 @@ class _ToggleSettingsRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Nunito',
                   color: isDark
                       ? AppColors.darkTextPrimary
                       : AppColors.textPrimary,
@@ -560,7 +550,6 @@ class _NavSettingsRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Nunito',
                     color: isDark
                         ? AppColors.darkTextPrimary
                         : AppColors.textPrimary,
@@ -573,7 +562,6 @@ class _NavSettingsRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Nunito',
                     color: isDark
                         ? AppColors.darkTextMuted
                         : AppColors.textMuted,
@@ -640,7 +628,6 @@ class _DisplaySettingsSheetState extends State<DisplaySettingsSheet> {
                     style: TextStyle(
                       fontSize: 19,
                       fontWeight: FontWeight.w800,
-                      fontFamily: 'Nunito',
                       color: isDark
                           ? AppColors.darkTextPrimary
                           : AppColors.textPrimary,
@@ -745,7 +732,6 @@ class _DisplaySettingsSheetState extends State<DisplaySettingsSheet> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'Nunito',
                             color: isDark
                                 ? AppColors.darkTextPrimary
                                 : AppColors.textPrimary,
@@ -846,7 +832,6 @@ class _DisplaySettingsSheetState extends State<DisplaySettingsSheet> {
                       style: TextStyle(
                         color: AppColors.primaryColor,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'Nunito',
                       ),
                     ),
                   ),
@@ -882,7 +867,6 @@ class _SheetSectionLabel extends StatelessWidget {
         fontSize: 10,
         fontWeight: FontWeight.w800,
         letterSpacing: 1.5,
-        fontFamily: 'Nunito',
         color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
       ),
     );
@@ -945,7 +929,6 @@ class _LayoutCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  fontFamily: 'Nunito',
                   color: isSel
                       ? AppColors.primaryColor
                       : (isDark
@@ -1037,7 +1020,6 @@ class _OptionTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Nunito',
                     color: isDark
                         ? AppColors.darkTextPrimary
                         : AppColors.textPrimary,
@@ -1049,7 +1031,6 @@ class _OptionTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
-                    fontFamily: 'Nunito',
                     color: isDark
                         ? AppColors.darkTextMuted
                         : AppColors.textMuted,

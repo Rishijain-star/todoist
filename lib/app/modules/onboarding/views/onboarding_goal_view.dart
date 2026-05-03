@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../core/const/app_colors.dart';
 import '../../../core/widgets/app_widgets.dart';
@@ -52,7 +53,6 @@ class OnboardingGoalView extends GetView<OnboardingController> {
                   color: isDark
                       ? AppColors.darkTextSecondary
                       : AppColors.textSecondary,
-                  fontFamily: 'Nunito',
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -75,7 +75,6 @@ class OnboardingGoalView extends GetView<OnboardingController> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'Nunito',
                     color: textColor,
                   ),
                   children: [
@@ -95,7 +94,6 @@ class OnboardingGoalView extends GetView<OnboardingController> {
                   color: isDark
                       ? AppColors.darkTextSecondary
                       : AppColors.textSecondary,
-                  fontFamily: 'Nunito',
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -205,29 +203,26 @@ class OnboardingGoalView extends GetView<OnboardingController> {
                   );
                 }),
               ),
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: controller.submitGoal,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(27),
-                    ),
-                    elevation: 0,
+              ElevatedButton(
+                onPressed: controller.submitGoal,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  minimumSize: const Size(double.infinity, 54),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(27),
                   ),
-                  child: const Text(
-                    'Continue →',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Continue →',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
             ],
           ),
         ),

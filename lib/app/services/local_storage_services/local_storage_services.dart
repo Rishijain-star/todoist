@@ -1,6 +1,4 @@
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../routes/app_pages.dart';
 import '../secure_token_service/secure_token_service.dart';
 
 class LocalStorageService {
@@ -22,6 +20,12 @@ class LocalStorageService {
   Future<void> setUserName(String name) =>
       sharedPreferences!.setString('userName', name);
   String getUserName() => sharedPreferences!.getString('userName') ?? '';
+  Future<void> setFirstName(String firstName) =>
+      sharedPreferences!.setString('firstName', firstName);
+  String getFirstName() => sharedPreferences!.getString('firstName') ?? '';
+  Future<void> setLastName(String lastName) =>
+      sharedPreferences!.setString('lastName', lastName);
+  String getLastName() => sharedPreferences!.getString('lastName') ?? '';
 
   Future<void> setEmailId(String email) =>
       sharedPreferences!.setString('userEmail', email);
@@ -70,6 +74,14 @@ class LocalStorageService {
 
   // ===================== LOGIN STATUS =====================
   bool isLoggedIn() => getAuthToken().isNotEmpty;
+
+  /// Cold-start session check: SharedPreferences token **or** secure storage.
+  /// Matches [ApiClient] so splash routing works if secure store is broken but
+  /// prefs still hold the token from login/register.
+  Future<bool> hasAuthSession() async {
+    if (getAuthToken().isNotEmpty) return true;
+    return (await SecureTokenService().getAuthToken()).isNotEmpty;
+  }
 
   // ===================== THEME & LANGUAGE =====================
   Future<void> setThemeMode(String mode) =>

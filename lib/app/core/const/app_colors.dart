@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
 
+/// Taskerer color system: **5 core roles** (see `docs/design_system.md`).
+/// Legacy names ([primaryColor], [card], etc.) stay for existing screens; new code
+/// may prefer [brandPrimary], [surface], [textMuted], …
 class AppColors {
   AppColors._();
 
-  // ── Primary Blue Scale ──────────────────────────────
+  // ── Core palette (5 roles) + legacy primary scale ───
   static const Color primaryColor   = Color(0xFF1867E9);
+  /// Brand / CTAs (alias of [primaryColor])
+  static const Color brandPrimary   = primaryColor;
+  /// App canvas (light) / cards
+  static const Color surface = Color(0xFFFFFFFF);
+  /// Main text (light)
+  static const Color onSurface = Color(0xFF0C1A3A);
+  /// Secondary & dividers — borders, de-emphasized text
+  static const Color onSurfaceVariant = Color(0xFFA0AABF);
+
+  // ── Primary tints (legacy) ──────────────────────────
   static const Color primaryMid     = Color(0xFF1B51A6);
   static const Color primaryDark    = Color(0xFF032B91);
   static const Color primaryDarkest = Color(0xFF0C2462);
   static const Color accentBlue     = Color(0xFF2A9FFB);
+  /// Same as [accentBlue] — use in new code for clarity
+  static const Color brandAccent    = accentBlue;
   static const Color primaryPale    = Color(0xFF54A4E8);
   static const Color primarySoftest = Color(0xFFA9D9F2);
 
@@ -17,14 +32,20 @@ class AppColors {
   static const Color red   = Color(0xFFF13427);
   static const Color green = Color(0xFF43A047);
   static const Color white = Color(0xFFFFFFFF);
+  /// Theme [ColorScheme.error]
+  static const Color semanticError = red;
 
   // ── Light Theme ─────────────────────────────────────
-  static const Color backgroundLight     = Color(0xFFF0F4FA);
+  /// Global light canvas — soft white (not pure #FFFFFF); cards/sheets use [surface]/[card].
+  static const Color canvasBackground    = Color(0xFFF7F8FA);
+  static const Color backgroundLight     = canvasBackground;
   static const Color pageBackground      = Color(0xFFDDE4F0);
   static const Color card                = Color(0xFFFFFFFF);
   static const Color cardSecondary       = Color(0xFFF0F5FF);
   static const Color inputFieldBg        = Color(0xFFF7F9FC);
   static const Color borderLight         = Color(0xFFE2E8F4);
+  /// Default borders / outlines (alias for [borderLight])
+  static const Color borderDefault       = borderLight;
   static const Color borderLighter       = Color(0xFFEEF2FA);
   static const Color textPrimary         = Color(0xFF0C1A3A);
   static const Color textSecondary       = Color(0xFF64748B);

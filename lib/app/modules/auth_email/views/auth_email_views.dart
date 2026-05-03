@@ -47,7 +47,6 @@ class _EmailLoginViewState extends State<EmailLoginView> {
             fontSize: 17,
             fontWeight: FontWeight.w700,
             color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-            fontFamily: 'Nunito',
           ),
         ),
         centerTitle: true,
@@ -64,7 +63,6 @@ class _EmailLoginViewState extends State<EmailLoginView> {
               keyboardType: TextInputType.emailAddress,
               style: TextStyle(
                 color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                fontFamily: 'Nunito',
               ),
               decoration: const InputDecoration(
                 labelText: 'Email',
@@ -80,7 +78,6 @@ class _EmailLoginViewState extends State<EmailLoginView> {
               obscureText: _obscure,
               style: TextStyle(
                 color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                fontFamily: 'Nunito',
               ),
               decoration: InputDecoration(
                 labelText: 'Password',
@@ -120,7 +117,7 @@ class _EmailLoginViewState extends State<EmailLoginView> {
               onPressed: () => Navigator.pushReplacementNamed(context, '/auth-signup'),
               child: RichText(
                 text: TextSpan(
-                  style: const TextStyle(fontSize: 13, fontFamily: 'Nunito'),
+                  style: const TextStyle(fontSize: 13,),
                   children: [
                     TextSpan(
                       text: "Don't have an account? ",
@@ -187,7 +184,6 @@ class _EmailSignupViewState extends State<EmailSignupView> {
             fontSize: 17,
             fontWeight: FontWeight.w700,
             color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-            fontFamily: 'Nunito',
           ),
         ),
         centerTitle: true,
@@ -202,7 +198,6 @@ class _EmailSignupViewState extends State<EmailSignupView> {
               keyboardType: TextInputType.emailAddress,
               style: TextStyle(
                 color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                fontFamily: 'Nunito',
               ),
               decoration: const InputDecoration(
                 labelText: 'Email',
@@ -216,7 +211,6 @@ class _EmailSignupViewState extends State<EmailSignupView> {
               obscureText: _obscure,
               style: TextStyle(
                 color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                fontFamily: 'Nunito',
               ),
               decoration: InputDecoration(
                 labelText: 'Password',
@@ -246,7 +240,7 @@ class _EmailSignupViewState extends State<EmailSignupView> {
               onPressed: () => Navigator.pushReplacementNamed(context, '/auth-login'),
               child: RichText(
                 text: TextSpan(
-                  style: const TextStyle(fontSize: 13, fontFamily: 'Nunito'),
+                  style: const TextStyle(fontSize: 13,),
                   children: [
                     TextSpan(
                       text: 'Already have an account? ',

@@ -8,6 +8,7 @@ class GradientButton extends StatelessWidget {
   final double? width;
   final double height;
   final Widget? icon;
+  final bool isLoading;
 
   const GradientButton({
     super.key,
@@ -16,6 +17,7 @@ class GradientButton extends StatelessWidget {
     this.width,
     this.height = 52,
     this.icon,
+    this.isLoading = false,
   });
 
   @override
@@ -25,8 +27,13 @@ class GradientButton extends StatelessWidget {
       height: height,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.primaryColor, AppColors.accentBlue],
+          gradient: LinearGradient(
+            colors: isLoading
+                ? [
+                    AppColors.primaryColor.withOpacity(0.7),
+                    AppColors.accentBlue.withOpacity(0.7)
+                  ]
+                : [AppColors.primaryColor, AppColors.accentBlue],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
@@ -40,28 +47,38 @@ class GradientButton extends StatelessWidget {
           ],
         ),
         child: ElevatedButton(
-          onPressed: onPressed,
+          onPressed: isLoading ? null : onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             padding: EdgeInsets.zero,
+            disabledBackgroundColor: Colors.transparent,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null) ...[icon!, const SizedBox(width: 8)],
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  fontFamily: 'Nunito',
+          child: isLoading
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (icon != null) ...[icon!, const SizedBox(width: 8)],
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -73,8 +90,15 @@ class SocialButton extends StatelessWidget {
   final String label;
   final Widget icon;
   final VoidCallback? onPressed;
+  final bool isLoading;
 
-  const SocialButton({super.key, required this.label, required this.icon, this.onPressed});
+  const SocialButton({
+    super.key,
+    required this.label,
+    required this.icon,
+    this.onPressed,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,31 +107,44 @@ class SocialButton extends StatelessWidget {
       width: double.infinity,
       height: 52,
       child: OutlinedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
           backgroundColor: isDark ? AppColors.darkSurface : AppColors.card,
           side: BorderSide(
             color: isDark ? AppColors.darkBorder : AppColors.borderLight,
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           padding: const EdgeInsets.symmetric(horizontal: 20),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            icon,
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                fontFamily: 'Nunito',
+        child: isLoading
+            ? SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isDark ? AppColors.primaryColor : AppColors.primaryColor,
+                  ),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  icon,
+                  const SizedBox(width: 10),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -331,7 +368,6 @@ class TaskChip extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 color: isActive ? AppColors.primaryColor : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
-                fontFamily: 'Nunito',
               ),
             ),
           ],

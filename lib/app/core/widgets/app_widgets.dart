@@ -1,5 +1,11 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:confetti/confetti.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../const/app_colors.dart';
+import '../../services/api_progress_service.dart';
 
 // ─── GRADIENT BUTTON ──────────────────────────────────────────────────────────
 class GradientButton extends StatelessWidget {
@@ -8,62 +14,78 @@ class GradientButton extends StatelessWidget {
   final double? width;
   final double height;
   final Widget? icon;
+  final bool isLoading;
 
   const GradientButton({
     super.key,
     required this.label,
     this.onPressed,
     this.width,
-    this.height = 52,
+    this.height = 44,
     this.icon,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: width ?? double.infinity,
-      height: height,
+      width: width?.w ?? double.infinity,
+      height: height.h,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.primaryColor, AppColors.accentBlue],
+          gradient: LinearGradient(
+            colors: isLoading
+                ? [
+                    AppColors.primaryColor.withOpacity(0.7),
+                    AppColors.accentBlue.withOpacity(0.7),
+                  ]
+                : [AppColors.primaryColor, AppColors.accentBlue],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           boxShadow: [
             BoxShadow(
               color: AppColors.primaryColor.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              blurRadius: 12.r,
+              offset: Offset(0, 4.h),
             ),
           ],
         ),
         child: ElevatedButton(
-          onPressed: onPressed,
+          onPressed: isLoading ? null : onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(14.r),
             ),
             padding: EdgeInsets.zero,
+            disabledBackgroundColor: Colors.transparent,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null) ...[icon!, const SizedBox(width: 8)],
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  fontFamily: 'Nunito',
+          child: isLoading
+              ? SizedBox(
+                  height: 20.h,
+                  width: 20.w,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (icon != null) ...[icon!, SizedBox(width: 8.w)],
+                    Text(
+                      label,
+                      style: GoogleFonts.inter(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -75,12 +97,16 @@ class SocialButton extends StatelessWidget {
   final String label;
   final Widget icon;
   final VoidCallback? onPressed;
+  final bool isLoading;
+  final double height;
 
   const SocialButton({
     super.key,
     required this.label,
     required this.icon,
     this.onPressed,
+    this.isLoading = false,
+    this.height = 44,
   });
 
   @override
@@ -88,37 +114,47 @@ class SocialButton extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       width: double.infinity,
-      height: 52,
+      height: height.h,
       child: OutlinedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
           backgroundColor: isDark ? AppColors.darkSurface : AppColors.card,
           side: BorderSide(
             color: isDark ? AppColors.darkBorder : AppColors.borderLight,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(14.r),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 0),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            icon,
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
-                fontFamily: 'Nunito',
+        child: isLoading
+            ? SizedBox(
+                height: 20.h,
+                width: 20.w,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isDark ? AppColors.primaryColor : AppColors.primaryColor,
+                  ),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  icon,
+                  SizedBox(width: 10.w),
+                  Text(
+                    label,
+                    style: GoogleFonts.inter(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -146,27 +182,27 @@ class AppCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: isDark ? AppColors.darkSurface : AppColors.card,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(14.r),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
         child: Container(
-          padding: padding ?? const EdgeInsets.all(14),
+          padding: padding ?? EdgeInsets.all(14.r),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
               color: isSelected
                   ? (selectedBorderColor ?? AppColors.primaryColor)
                   : (isDark ? AppColors.darkBorder : AppColors.borderLight),
-              width: isSelected ? 1.5 : 1,
+              width: isSelected ? 1.5.w : 1.w,
             ),
             boxShadow: isDark
                 ? null
                 : [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.03),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                      blurRadius: 8.r,
+                      offset: Offset(0, 2.h),
                     ),
                   ],
           ),
@@ -186,12 +222,12 @@ class BottomSheetHandle extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: Container(
-        width: 36,
-        height: 4,
-        margin: const EdgeInsets.only(top: 12, bottom: 8),
+        width: 36.w,
+        height: 4.h,
+        margin: EdgeInsets.only(top: 12.h, bottom: 8.h),
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkBorder : AppColors.borderLight,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(4.r),
         ),
       ),
     );
@@ -378,7 +414,6 @@ class TaskChip extends StatelessWidget {
                     : (isDark
                           ? AppColors.darkTextSecondary
                           : AppColors.textSecondary),
-                fontFamily: 'Nunito',
               ),
             ),
           ],
@@ -430,6 +465,89 @@ class TaskererProgressBar extends StatelessWidget {
   }
 }
 
+/// Fixed under status bar; onboarding-style bar + optional percentage label.
+class TaskererApiProgressHost extends StatelessWidget {
+  const TaskererApiProgressHost({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Get.isRegistered<ApiProgressService>()) {
+      return const SizedBox.shrink();
+    }
+    final api = Get.find<ApiProgressService>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Obx(() {
+      if (!api.visible.value) return const SizedBox.shrink();
+      return Material(
+        color: Colors.transparent,
+        elevation: 0,
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 6, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (api.indeterminate.value)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: SizedBox(
+                      height: 5,
+                      child: LinearProgressIndicator(
+                        backgroundColor: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.borderLight,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                  )
+                else
+                  SizedBox(
+                    height: 5,
+                    child: TaskererProgressBar(value: api.progress.value),
+                  ),
+                if (api.label.value.isNotEmpty || !api.indeterminate.value) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          api.label.value.isEmpty
+                              ? (api.indeterminate.value ? '' : 'Working…')
+                              : api.label.value,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                      if (!api.indeterminate.value)
+                        Text(
+                          '${(api.progress.value * 100).clamp(0, 100).round()}%',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  }
+}
+
 // ─── APP TASK CARD ────────────────────────────────────────────────────────────
 class AppTaskCard extends StatefulWidget {
   final String title;
@@ -442,6 +560,8 @@ class AppTaskCard extends StatefulWidget {
   final bool isOverdue;
   final VoidCallback? onTap;
   final Function(bool)? onCheckTap;
+  final VoidCallback? onMoreTap;
+  final List<Widget>? subtasks;
 
   const AppTaskCard({
     super.key,
@@ -455,6 +575,8 @@ class AppTaskCard extends StatefulWidget {
     this.isOverdue = false,
     this.onTap,
     this.onCheckTap,
+    this.onMoreTap,
+    this.subtasks,
   });
 
   static Widget shimmer({bool isDark = false}) {
@@ -470,13 +592,32 @@ class AppTaskCard extends StatefulWidget {
   State<AppTaskCard> createState() => _AppTaskCardState();
 }
 
-class _AppTaskCardState extends State<AppTaskCard> {
+class _AppTaskCardState extends State<AppTaskCard>
+    with SingleTickerProviderStateMixin {
   late bool _isDone;
+  late AnimationController _animController;
+  late Animation<double> _scaleAnim;
+  late ConfettiController _confettiController;
 
   @override
   void initState() {
     super.initState();
     _isDone = widget.isDone;
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _scaleAnim = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.elasticOut),
+    );
+    _animController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animController.reverse();
+      }
+    });
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 1),
+    );
   }
 
   @override
@@ -485,6 +626,13 @@ class _AppTaskCardState extends State<AppTaskCard> {
     if (oldWidget.isDone != widget.isDone) {
       _isDone = widget.isDone;
     }
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    _confettiController.dispose();
+    super.dispose();
   }
 
   @override
@@ -498,170 +646,262 @@ class _AppTaskCardState extends State<AppTaskCard> {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          onTap: widget.onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Material(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(20),
+            child: InkWell(
+              onTap: widget.onTap,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isDark ? AppColors.darkBorder : AppColors.borderLight,
-              ),
-              boxShadow: isDark
-                  ? null
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    setState(() => _isDone = !_isDone);
-                    if (widget.onCheckTap != null) {
-                      widget.onCheckTap!(_isDone);
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 24,
-                    height: 24,
-                    margin: const EdgeInsets.only(top: 2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _isDone ? AppColors.green : Colors.transparent,
-                      border: Border.all(
-                        color: _isDone
-                            ? AppColors.green
-                            : (isDark
-                                  ? AppColors.darkTextMuted
-                                  : AppColors.textMuted),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: _isDone
-                        ? const Icon(Icons.check, size: 16, color: Colors.white)
-                        : null,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.borderLight,
                   ),
+                  boxShadow: isDark
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.title,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: _isDone
-                              ? (isDark
-                                    ? AppColors.darkTextMuted
-                                    : AppColors.textMuted)
-                              : titleColor,
-                          fontFamily: 'Nunito',
-                          decoration: _isDone
-                              ? TextDecoration.lineThrough
-                              : null,
-                        ),
-                      ),
-                      if (widget.subtitle != null && widget.subtitle!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          widget.subtitle!,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: subColor,
-                            fontFamily: 'Nunito',
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isDone = !_isDone;
+                              if (_isDone) {
+                                _animController.forward();
+                                _confettiController.play();
+                              }
+                            });
+                            if (widget.onCheckTap != null) {
+                              widget.onCheckTap!(_isDone);
+                            }
+                          },
+                          child: ScaleTransition(
+                            scale: _scaleAnim,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: 24,
+                              height: 24,
+                              margin: const EdgeInsets.only(top: 2),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _isDone
+                                    ? AppColors.green
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: _isDone
+                                      ? AppColors.green
+                                      : (isDark
+                                            ? AppColors.darkTextMuted
+                                            : AppColors.textMuted),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: _isDone
+                                  ? const Icon(
+                                      Icons.check,
+                                      size: 16,
+                                      color: Colors.white,
+                                    )
+                                  : null,
+                            ),
                           ),
                         ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.title,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: _isDone
+                                      ? (isDark
+                                            ? AppColors.darkTextMuted
+                                            : AppColors.textMuted)
+                                      : titleColor,
+                                  decoration: _isDone
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                ),
+                              ),
+                              if (widget.subtitle != null &&
+                                  widget.subtitle!.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  widget.subtitle!,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: subColor,
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  if (widget.time != null) ...[
+                                    Icon(
+                                      Icons.calendar_today_outlined,
+                                      size: 12,
+                                      color: widget.isOverdue
+                                          ? AppColors.red
+                                          : subColor,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      widget.time!,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: widget.isOverdue
+                                            ? AppColors.red
+                                            : subColor,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                  ],
+                                  if (widget.commentCount != null &&
+                                      widget.commentCount! > 0) ...[
+                                    Icon(
+                                      Icons.chat_bubble_outline_rounded,
+                                      size: 12,
+                                      color: subColor,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      widget.commentCount.toString(),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: subColor,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                  ],
+                                  if (widget.category != null) ...[
+                                    Container(
+                                      width: 6,
+                                      height: 6,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            widget.dotColor ??
+                                            AppColors.primaryColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      widget.category!,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: subColor,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            if (widget.dotColor != null && !_isDone)
+                              Container(
+                                width: 8,
+                                height: 8,
+                                margin: const EdgeInsets.only(top: 6),
+                                decoration: BoxDecoration(
+                                  color: widget.dotColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            if (widget.onMoreTap != null)
+                              IconButton(
+                                icon: Icon(Icons.more_horiz, color: subColor),
+                                onPressed: widget.onMoreTap,
+                                constraints: const BoxConstraints(),
+                                padding: const EdgeInsets.all(4),
+                              ),
+                          ],
+                        ),
                       ],
+                    ),
+                    if (widget.subtasks != null &&
+                        widget.subtasks!.isNotEmpty) ...[
                       const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          if (widget.time != null) ...[
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              size: 12,
-                              color: widget.isOverdue ? AppColors.red : subColor,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.time!,
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: widget.isOverdue ? AppColors.red : subColor,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                          ],
-                          if (widget.commentCount != null && widget.commentCount! > 0) ...[
-                            Icon(
-                              Icons.chat_bubble_outline_rounded,
-                              size: 12,
-                              color: subColor,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.commentCount.toString(),
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: subColor,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                          ],
-                          if (widget.category != null) ...[
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: widget.dotColor ?? AppColors.primaryColor,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.category!,
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: subColor,
-                              ),
-                            ),
-                          ],
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.only(left: 36),
+                        child: Column(children: widget.subtasks!),
                       ),
                     ],
-                  ),
+                  ],
                 ),
-                if (widget.dotColor != null && !_isDone)
-                  Container(
-                    width: 8,
-                    height: 8,
-                    margin: const EdgeInsets.only(top: 6),
-                    decoration: BoxDecoration(
-                      color: widget.dotColor,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-              ],
+              ),
             ),
           ),
-        ),
+          ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            shouldLoop: false,
+            colors: const [
+              Colors.green,
+              Colors.blue,
+              Colors.pink,
+              Colors.orange,
+              Colors.purple,
+            ],
+            createParticlePath: drawStar,
+          ),
+        ],
       ),
     );
+  }
+
+  Path drawStar(Size size) {
+    double degToRad(double deg) => deg * (3.1415926535897932 / 180.0);
+
+    const numberOfPoints = 5;
+    final halfWidth = size.width / 2;
+    final externalRadius = halfWidth;
+    final internalRadius = halfWidth / 2.5;
+    final degreesPerStep = degToRad(360 / numberOfPoints);
+    final halfDegreesPerStep = degreesPerStep / 2;
+    final path = Path();
+    final fullAngle = degToRad(360);
+    path.moveTo(size.width, halfWidth);
+
+    for (double step = 0; step < fullAngle; step += degreesPerStep) {
+      path.lineTo(
+        halfWidth + externalRadius * math.cos(step),
+        halfWidth + externalRadius * math.sin(step),
+      );
+      path.lineTo(
+        halfWidth + internalRadius * math.cos(step + halfDegreesPerStep),
+        halfWidth + internalRadius * math.sin(step + halfDegreesPerStep),
+      );
+    }
+    path.close();
+    return path;
   }
 }
 
@@ -732,7 +972,6 @@ class AppTemplateCard extends StatelessWidget {
                 fontSize: 14,
                 fontWeight: FontWeight.w800,
                 color: titleColor,
-                fontFamily: 'Nunito',
               ),
             ),
             const SizedBox(height: 4),
@@ -744,7 +983,6 @@ class AppTemplateCard extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: muted,
-                fontFamily: 'Nunito',
               ),
             ),
             const Spacer(),
@@ -758,7 +996,6 @@ class AppTemplateCard extends StatelessWidget {
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: muted,
-                    fontFamily: 'Nunito',
                   ),
                 ),
               ],
@@ -798,7 +1035,9 @@ class AppSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.textPrimary;
 
     return Container(
       width: double.infinity,
@@ -828,8 +1067,8 @@ class AppSummaryCard extends StatelessWidget {
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
                       color: isDark
-                          ? AppColors.darkTextMuted
-                          : AppColors.textMuted,
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -896,7 +1135,6 @@ class AppSummaryCard extends StatelessWidget {
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
                         color: textColor,
-                        fontFamily: 'Nunito',
                       ),
                       children: [
                         TextSpan(

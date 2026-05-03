@@ -66,7 +66,6 @@ class AuthWelcomeView extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                   height: 1.2,
                   color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                  fontFamily: 'Nunito',
                 ),
               ),
 
@@ -109,7 +108,6 @@ class AuthWelcomeView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
-                    fontFamily: 'Nunito',
                     height: 1.5,
                   ),
                 ),
@@ -142,7 +140,6 @@ class _EmailOption extends StatelessWidget {
           fontSize: 15,
           fontWeight: FontWeight.w600,
           color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-          fontFamily: 'Nunito',
         ),
       ),
     );
@@ -373,7 +370,6 @@ class _FacebookIcon extends StatelessWidget {
             color: Colors.white,
             fontSize: 14,
             fontWeight: FontWeight.w800,
-            fontFamily: 'Nunito',
           ),
         ),
       ),

@@ -25,6 +25,8 @@ abstract class Routes {
   static const SETTINGS = _Paths.SETTINGS;
   static const TEAM = _Paths.TEAM;
   static const NOTIFICATIONS = _Paths.NOTIFICATIONS;
+  static const REPORTS = _Paths.REPORTS;
+  static const ADMIN = _Paths.ADMIN;
 }
 
 abstract class _Paths {
@@ -51,4 +53,6 @@ abstract class _Paths {
   static const SETTINGS = '/settings';
   static const TEAM = '/team';
   static const NOTIFICATIONS = '/notifications';
+  static const REPORTS = '/reports';
+  static const ADMIN = '/admin';
 }
