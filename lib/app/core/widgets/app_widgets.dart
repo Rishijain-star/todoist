@@ -1266,3 +1266,113 @@ class ShimmerBox extends StatelessWidget {
     );
   }
 }
+
+// ─── GLOBAL CONFIRMATION DIALOG ───────────────────────────────────────────────
+class ConfirmationDialog extends StatelessWidget {
+  final String title;
+  final String? message;
+  final VoidCallback onConfirm;
+  final String confirmText;
+  final String cancelText;
+
+  const ConfirmationDialog({
+    super.key,
+    required this.title,
+    this.message,
+    required this.onConfirm,
+    this.confirmText = 'Yes',
+    this.cancelText = 'No',
+  });
+
+  static Future<bool> show({
+    required BuildContext context,
+    required String title,
+    String? message,
+    String confirmText = 'Yes',
+    String cancelText = 'No',
+  }) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => ConfirmationDialog(
+        title: title,
+        message: message,
+        confirmText: confirmText,
+        cancelText: cancelText,
+        onConfirm: () => Navigator.pop(context, true),
+      ),
+    );
+    return result ?? false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return AlertDialog(
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+          color: isDark
+              ? AppColors.darkTextPrimary
+              : AppColors.textPrimary,
+        ),
+      ),
+      content: message != null
+          ? Text(
+              message!,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
+              ),
+            )
+          : null,
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(
+            cancelText,
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
+        ),
+        TextButton(
+          onPressed: onConfirm,
+          child: Text(
+            confirmText,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── ASSET ICON HELPER ─────────────────────────────────────────────────────────
+class AssetIcon extends StatelessWidget {
+  final String assetPath;
+  final double size;
+  final Color? color;
+
+  const AssetIcon({
+    super.key,
+    required this.assetPath,
+    this.size = 24,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      assetPath,
+      width: size,
+      height: size,
+      color: color,
+    );
+  }
+}

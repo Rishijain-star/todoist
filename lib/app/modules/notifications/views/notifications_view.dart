@@ -16,22 +16,18 @@ class NotificationsView extends GetView<NotificationsController> {
         elevation: 0,
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: Icon(Icons.arrow_back_ios_new_rounded, size: 18, 
+          icon: Icon(Icons.arrow_back_rounded,
               color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
         ),
         title: Text(
           'Notifications',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-          ),
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
-        centerTitle: true,
+        centerTitle: false,
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.done_all_rounded, size: 20, 
+            icon: Icon(Icons.done_all_rounded,
                 color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
           ),
         ],
@@ -104,29 +100,20 @@ class _NotificationTile extends StatelessWidget {
                     children: [
                       Text(
                         item.title,
-                        style: TextStyle(
-                          fontSize: 15,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                         ),
                       ),
                       Text(
                         item.time,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
-                        ),
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
                     item.desc,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       height: 1.4,
                     ),
                   ),

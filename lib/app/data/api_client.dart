@@ -28,7 +28,8 @@ class ApiClient {
     // Local override: --dart-define=APP_API_BASE_URL=http://127.0.0.1:8000/api/v1/
     const configuredBase = String.fromEnvironment(
       'APP_API_BASE_URL',
-      defaultValue: 'https://todoist.jamesbrookit.com/api/v1/',
+      // defaultValue: 'https://todoist.jamesbrookit.com/api/v1/',
+      defaultValue: 'http://192.168.1.38:8000/api/v1/',
     );
     _dio = Dio(
       BaseOptions(

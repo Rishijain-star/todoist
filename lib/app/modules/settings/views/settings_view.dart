@@ -286,6 +286,19 @@ class _SettingsViewState extends State<SettingsView> {
           // ── General ──────────────────────────────────
           _SectionLabel(label: 'General', isDark: isDark),
 
+          _NavSettingsRow(
+            icon: Icons.settings_outlined,
+            iconColor: AppColors.primaryColor,
+            label: 'General Settings',
+            isDark: isDark,
+            onTap: () => showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const GeneralSettingsSheet(),
+            ),
+          ),
+
           _ToggleSettingsRow(
             icon: Icons.calendar_today_outlined,
             iconColor: AppColors.green,
@@ -355,8 +368,15 @@ class _SettingsViewState extends State<SettingsView> {
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: OutlinedButton(
               onPressed: () async {
-                await LocalStorageService().logout();
-                Get.offAllNamed(Routes.SPLASH);
+                final confirmed = await ConfirmationDialog.show(
+                  context: context,
+                  title: 'Sign Out',
+                  message: 'Are you sure you want to sign out?',
+                );
+                if (confirmed) {
+                  await LocalStorageService().logout();
+                  Get.offAllNamed(Routes.SPLASH);
+                }
               },
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(
@@ -1053,6 +1073,356 @@ class _OptionTile extends StatelessWidget {
             indent: 14,
             endIndent: 14,
           ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  GENERAL SETTINGS SHEET
+// ═══════════════════════════════════════════════════
+class GeneralSettingsSheet extends StatefulWidget {
+  const GeneralSettingsSheet({super.key});
+
+  @override
+  State<GeneralSettingsSheet> createState() => _GeneralSettingsSheetState();
+}
+
+class _GeneralSettingsSheetState extends State<GeneralSettingsSheet> {
+  bool _syncHomeView = false;
+  bool _smartDateRecognition = false;
+  bool _resetSubtasks = false;
+  bool _autoAcceptInvites = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final muted = isDark ? AppColors.darkTextMuted : AppColors.textMuted;
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.88,
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border(
+          top: BorderSide(
+            color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+          ),
+        ),
+      ),
+      child: Column(
+        children: [
+          const BottomSheetHandle(),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 12),
+            child: Row(
+              children: [
+                Text(
+                  'General',
+                  style: TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    color: titleColor,
+                  ),
+                ),
+                const Spacer(),
+              ],
+            ),
+          ),
+
+          Divider(
+            color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+            height: 1,
+          ),
+
+          // Scrollable content
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                // Home view
+                _SheetSectionLabel(label: 'HOME VIEW', isDark: isDark),
+                const SizedBox(height: 10),
+                _GeneralSettingRow(
+                  label: 'Home view',
+                  value: 'Inbox',
+                  isDark: isDark,
+                  onTap: () {},
+                ),
+                const SizedBox(height: 16),
+
+                // Sync home view
+                _ToggleGeneralSettingRow(
+                  icon: Icons.sync_rounded,
+                  label: 'Sync home view',
+                  subtitle: 'Make home view the same on all platforms',
+                  value: _syncHomeView,
+                  isDark: isDark,
+                  onChanged: (v) => setState(() => _syncHomeView = v),
+                ),
+
+                const SizedBox(height: 16),
+                Divider(
+                  color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+                ),
+                const SizedBox(height: 16),
+
+                // Language
+                _SheetSectionLabel(label: 'LANGUAGE', isDark: isDark),
+                const SizedBox(height: 10),
+                _GeneralSettingRow(
+                  label: 'Language',
+                  value: 'Set automatically',
+                  isDark: isDark,
+                  onTap: () {},
+                ),
+
+                const SizedBox(height: 16),
+                Divider(
+                  color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+                ),
+                const SizedBox(height: 16),
+
+                // Smart date recognition
+                _ToggleGeneralSettingRow(
+                  icon: Icons.date_range_rounded,
+                  label: 'Smart date recognition',
+                  subtitle: 'Automatically detect dates in tasks',
+                  value: _smartDateRecognition,
+                  isDark: isDark,
+                  onChanged: (v) => setState(() => _smartDateRecognition = v),
+                ),
+
+                const SizedBox(height: 16),
+                Divider(
+                  color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+                ),
+                const SizedBox(height: 16),
+
+                // Reset sub-tasks
+                _ToggleGeneralSettingRow(
+                  icon: Icons.refresh_rounded,
+                  label: 'Reset sub-tasks',
+                  subtitle: 'Reset sub-tasks when you complete a recurring task',
+                  showIcon: true,
+                  value: _resetSubtasks,
+                  isDark: isDark,
+                  onChanged: (v) => setState(() => _resetSubtasks = v),
+                ),
+
+                const SizedBox(height: 16),
+                Divider(
+                  color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+                ),
+                const SizedBox(height: 16),
+
+                // Auto accept invites
+                _ToggleGeneralSettingRow(
+                  icon: Icons.person_add_rounded,
+                  label: 'Auto accept invites',
+                  subtitle: 'Automatically accept invites to shared projects',
+                  value: _autoAcceptInvites,
+                  isDark: isDark,
+                  onChanged: (v) => setState(() => _autoAcceptInvites = v),
+                ),
+
+                const SizedBox(height: 16),
+                Divider(
+                  color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+                ),
+                const SizedBox(height: 16),
+
+                // Sound
+                _SheetSectionLabel(label: 'SOUND', isDark: isDark),
+                const SizedBox(height: 10),
+                _GeneralSettingRow(
+                  label: 'Task complete tone',
+                  isDark: isDark,
+                  onTap: () {},
+                ),
+
+                const SizedBox(height: 16),
+                Divider(
+                  color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+                ),
+                const SizedBox(height: 16),
+
+                // Date & time
+                _SheetSectionLabel(label: 'DATE & TIME', isDark: isDark),
+                const SizedBox(height: 10),
+                _GeneralSettingRow(
+                  label: 'Time zone',
+                  value: 'The web app and email reminders will use Asia/Kolkata',
+                  isDark: isDark,
+                  isSubtitle: true,
+                  onTap: () {},
+                ),
+                const SizedBox(height: 10),
+                _GeneralSettingRow(
+                  label: 'Start the week on',
+                  value: 'Monday',
+                  isDark: isDark,
+                  onTap: () {},
+                ),
+
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GeneralSettingRow extends StatelessWidget {
+  final String label;
+  final String? value;
+  final bool isDark;
+  final bool isSubtitle;
+  final VoidCallback onTap;
+
+  const _GeneralSettingRow({
+    required this.label,
+    required this.isDark,
+    required this.onTap,
+    this.value,
+    this.isSubtitle = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final muted = isDark ? AppColors.darkTextMuted : AppColors.textMuted;
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: titleColor,
+                    ),
+                  ),
+                  if (value != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      value!,
+                      style: TextStyle(
+                        fontSize: isSubtitle ? 14 : 13,
+                        fontWeight: isSubtitle ? FontWeight.w500 : FontWeight.w600,
+                        color: muted,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: muted,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ToggleGeneralSettingRow extends StatelessWidget {
+  final IconData? icon;
+  final String label;
+  final String subtitle;
+  final bool showIcon;
+  final bool value;
+  final bool isDark;
+  final ValueChanged<bool> onChanged;
+
+  const _ToggleGeneralSettingRow({
+    this.icon,
+    required this.label,
+    required this.subtitle,
+    this.showIcon = false,
+    required this.value,
+    required this.isDark,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final muted = isDark ? AppColors.darkTextMuted : AppColors.textMuted;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: titleColor,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: muted,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (showIcon) ...[
+          const SizedBox(width: 12),
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(9),
+              border: Border.all(
+                color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+              ),
+            ),
+            child: Icon(
+              Icons.help_outline_rounded,
+              size: 16,
+              color: muted,
+            ),
+          ),
+        ],
+        const SizedBox(width: 12),
+        Switch.adaptive(
+          value: value,
+          onChanged: onChanged,
+          activeColor: AppColors.primaryColor,
+          trackColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected)
+                ? AppColors.primaryColor.withOpacity(0.3)
+                : null,
+          ),
+        ),
       ],
     );
   }

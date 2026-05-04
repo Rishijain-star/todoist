@@ -58,8 +58,17 @@ return Application::configure(basePath: dirname(__DIR__))
             if (!$request->is('api/*')) {
                 return null;
             }
-            if (config('app.debug')) {
-                return null;
+            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                return response()->json([
+                    'message' => 'Unauthenticated',
+                    'code' => 401,
+                ], 401);
+            }
+            if ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
+                return response()->json([
+                    'message' => 'Forbidden',
+                    'code' => 403,
+                ], 403);
             }
             if ($e instanceof ValidationException) {
                 return null;
@@ -67,13 +76,10 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e instanceof HttpExceptionInterface) {
                 return null;
             }
-            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
-                return null;
-            }
-            if ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
-                return null;
-            }
             if ($e instanceof \Illuminate\Http\Exceptions\HttpResponseException) {
+                return null;
+            }
+            if (config('app.debug')) {
                 return null;
             }
 

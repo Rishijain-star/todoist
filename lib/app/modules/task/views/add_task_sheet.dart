@@ -458,13 +458,7 @@ class _DatePickerSheetState extends State<_DatePickerSheet> {
             padding: const EdgeInsets.fromLTRB(18, 4, 18, 12),
             child: Text(
               'Pick a Date',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
-              ),
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
 
@@ -504,13 +498,7 @@ class _DatePickerSheetState extends State<_DatePickerSheet> {
               children: [
                 Text(
                   '${_monthName(_focused.month)} ${_focused.year}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.textPrimary,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const Spacer(),
                 _CalArrow(
@@ -542,10 +530,9 @@ class _DatePickerSheetState extends State<_DatePickerSheet> {
                       child: Center(
                         child: Text(
                           d,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             color: AppColors.textMuted,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),
@@ -599,8 +586,8 @@ class _DatePickerSheetState extends State<_DatePickerSheet> {
                       child: Center(
                         child: Text(
                           '$day',
-                          style: TextStyle(
-                            fontSize: 12,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontSize: 12.sp,
                             fontWeight: FontWeight.w600,
                             color: (isToday || isSel)
                                 ? Colors.white
@@ -692,8 +679,7 @@ class _QuickDateRow extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 14,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? AppColors.darkTextPrimary
@@ -756,7 +742,7 @@ class _TimePickerSheet extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : Colors.white,
+        color: isDark ? AppColors.darkSurface : AppColors.card,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: const EdgeInsets.all(20),
@@ -765,11 +751,7 @@ class _TimePickerSheet extends StatelessWidget {
         children: [
           Text(
             'Select Time',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : AppColors.textPrimary,
-            ),
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -777,9 +759,10 @@ class _TimePickerSheet extends StatelessWidget {
             child: CupertinoTheme(
               data: CupertinoThemeData(
                 textTheme: CupertinoTextThemeData(
-                  dateTimePickerTextStyle: TextStyle(
-                    color: isDark ? Colors.white : AppColors.textPrimary,
-                    fontSize: 20,
+                  dateTimePickerTextStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: isDark
+                        ? AppColors.darkTextPrimary
+                        : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -824,9 +807,7 @@ class _TimeBlock extends StatelessWidget {
       child: Center(
         child: Text(
           value.toString().padLeft(2, '0'),
-          style: const TextStyle(
-            fontSize: 34,
-            fontWeight: FontWeight.w800,
+          style: Theme.of(context).textTheme.displayLarge?.copyWith(
             color: Colors.white,
           ),
         ),
@@ -866,13 +847,7 @@ class _PrioritySheet extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(18, 4, 18, 12),
             child: Text(
               'Set Priority',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: isDark
-                    ? AppColors.darkTextPrimary
-                    : AppColors.textPrimary,
-              ),
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
           const SizedBox(height: 8),
@@ -899,8 +874,7 @@ class _PrioritySheet extends StatelessWidget {
                     const SizedBox(width: 16),
                     Text(
                       '${p.$2}',
-                      style: TextStyle(
-                        fontSize: 15,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: isDark
                             ? AppColors.darkTextPrimary
@@ -910,9 +884,7 @@ class _PrioritySheet extends StatelessWidget {
                     const Spacer(),
                     Text(
                       'P${p.$1}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: p.$3,
                       ),
                     ),

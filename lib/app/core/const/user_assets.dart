@@ -27,4 +27,9 @@ class UserAssets {
   static const String iconTaskActivity = 'assets/user_media/icons/activity.png';
   static const String iconTaskEmail = 'assets/user_media/icons/mail (1).png';
   static const String iconTaskDelete = 'assets/user_media/icons/delete.png';
+
+  // Header and other icons
+  static const String iconSetting = 'assets/user_media/icons/setting.png';
+  static const String iconRinging = 'assets/user_media/icons/ringing.png';
+  static const String iconQuestion = 'assets/user_media/icons/question.png';
 }

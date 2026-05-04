@@ -851,22 +851,49 @@ class _TaskDetailSheetState extends State<TaskDetailSheet> {
     required String hint,
   }) async {
     final ctrl = TextEditingController();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(title),
+        backgroundColor: isDark ? AppColors.darkSurface : AppColors.card,
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
         content: TextField(
           controller: ctrl,
-          decoration: InputDecoration(hintText: hint),
+          style: Theme.of(context).textTheme.bodyMedium,
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: isDark ? AppColors.darkTextMuted : AppColors.textMuted,
+            ),
+            filled: true,
+            fillColor: isDark ? AppColors.darkSurfaceElevated : AppColors.inputFieldBg,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: isDark ? AppColors.darkBorder : AppColors.borderDefault,
+              ),
+            ),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, ctrl.text),
-            child: const Text('Save'),
+            child: Text(
+              'Save',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: AppColors.brandPrimary,
+              ),
+            ),
           ),
         ],
       ),
@@ -979,11 +1006,7 @@ class _DatePickerSheetState extends State<DatePickerSheet> {
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Text(
               'Pick a Date',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-                color: isDark ? Colors.white : Colors.black,
-              ),
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
           CalendarDatePicker(
@@ -1029,11 +1052,11 @@ class PrioritySheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const BottomSheetHandle(),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
             child: Text(
               'Set Priority',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
           ...priorities.map(
@@ -1041,7 +1064,12 @@ class PrioritySheet extends StatelessWidget {
               leading: Icon(Icons.flag_rounded, color: p.$3),
               title: Text(
                 p.$2,
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
+                ),
               ),
               trailing: current == p.$1
                   ? const Icon(Icons.check, color: AppColors.primaryColor)
@@ -1077,10 +1105,8 @@ class CommentItem extends StatelessWidget {
           backgroundColor: AppColors.primaryColor,
           child: Text(
             userName[0].toUpperCase(),
-            style: const TextStyle(
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
             ),
           ),
         ),
@@ -1091,17 +1117,18 @@ class CommentItem extends StatelessWidget {
             children: [
               Text(
                 userName,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : Colors.black,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary,
                 ),
               ),
               Text(
                 text,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isDark ? Colors.white70 : Colors.black87,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary,
                 ),
               ),
             ],

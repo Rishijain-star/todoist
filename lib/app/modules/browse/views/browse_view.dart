@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../routes/app_pages.dart';
 import '../../../core/const/app_colors.dart';
+import '../../../core/const/user_assets.dart';
 import '../../../core/widgets/app_widgets.dart';
 import '../../../services/local_storage_services/local_storage_services.dart';
 import '../controllers/browse_controller.dart';
@@ -40,7 +41,9 @@ class BrowseView extends GetView<BrowseController> {
               width: 48,
               height: 48,
               decoration: const BoxDecoration(
-                color: AppColors.accentBlue,
+                gradient: LinearGradient(
+                  colors: [AppColors.primaryColor, AppColors.accentBlue],
+                ),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -71,21 +74,22 @@ class BrowseView extends GetView<BrowseController> {
             child: Row(
               children: [
                 AppIconButton(
+                icon: Image.asset(
+                  UserAssets.iconSetting,
+                  width: 24,
+                  height: 24,
+                  fit: BoxFit.contain,
+                ),
+                onTap: () => Get.toNamed(Routes.SETTINGS),
+              ),
+                const SizedBox(width: 8),
+                AppIconButton(
                   icon: Icon(
                     Icons.notifications_none_rounded,
                     size: 24,
                     color: iconColor,
                   ),
                   onTap: () => Get.toNamed(Routes.NOTIFICATIONS),
-                ),
-                const SizedBox(width: 8),
-                AppIconButton(
-                  icon: Icon(
-                    Icons.gps_fixed_rounded,
-                    size: 20,
-                    color: iconColor,
-                  ),
-                  onTap: () {},
                 ),
               ],
             ),
@@ -174,11 +178,6 @@ class BrowseView extends GetView<BrowseController> {
                 ? AppColors.darkTextSecondary
                 : AppColors.textSecondary,
             onTap: () {
-              // Navigate to a temporary view or the ProjectsView itself
-              // but since ProjectsView is part of Dashboard, we might just
-              // show the templates in a bottom sheet or a new page.
-              // For now, I'll show the ProjectsView content in a new page
-              // to allow template selection.
               Get.toNamed(Routes.BROWSE_TEMPLATES);
             },
           ),
