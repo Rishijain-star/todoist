@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- API base URL uses HTTP; Android 9+ blocks cleartext by default. -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">todoist.jamesbrookit.com</domain>
+        <!-- Local / emulator dev (dart-define APP_API_BASE_URL) -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>
